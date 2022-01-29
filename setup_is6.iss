@@ -11,15 +11,18 @@
 ; ------
 ; Translations : German   : xXxJannik#0001
 ;                French   : EnergyCube#7471
+;                Polish   : Dr.MonaLisa#9523
+;                Spanish  : Âgræl#9008
 ;                Others   : DeepL / DuckDuckGo Translator
 ; External Dep. 
-;   InnoSetup Downloader Plugin, BASS
+;   InnoSetup Downloader Plugin (download files + support mirrors), BASS (audio module)
 ; Additinal Content
 ;   Omega (Patch & Neo Content Patch), yukon aka. drex (dreXmod)
 ;   Dege (DX Wrapper: dgVoodoo), GOG (DX Wrapper)
 ; Other Help
-;   CyrentiX#1219, xq_happy#7140, giord#4697
-;   And every members of EE:Reborn team :>
+;   CyrentiX#1219 (Compatibility), xq_happy#7140 (Compatibility & Chinese files)
+;   giord#4697 (Content), IvaN#9233 (Spanish files)
+;   Every members of EE:Reborn team and and all others I may have forgotten :>
 
 
 ;  Notes  | Empire Earth is very sensitive to version change (which leads to multiplayer incompatibility),
@@ -127,15 +130,17 @@
 [Setup]
 ; SignTool: We need to use InnoSetup SignTool feature to sign install/uninstall etc...
 ; AppId: Tools > Generate GUID
+; Be very carefull to AppId, it's like the unique id of the setup, be sure to generate it with inno setup
+; the first time you distribute your setup and to keep it forever for the setup !
 #if InstallType == "EE"
-  AppId={{4C0B46D8-E7EB-4B95-97D4-A578D9B914C6}
+  AppId={
   SetupIconFile=./data/Empire Earth Base/Empire Earth/game.ico
   WizardSmallImageFile=./WizardSmallImageFileEE.bmp
   #if SignSetup
     SignTool=NameInInnoSetupEE $f
   #endif
 #elif InstallType == "NeoEE"
-  AppId={{A24FCC7A-5491-4FEA-837B-4E4430C349DA}
+  AppId={
   SetupIconFile=./data/NeoEE Base/Empire Earth/neoee.ico
   WizardSmallImageFile=./WizardSmallImageFileNeo.bmp
   #if SignSetup
@@ -284,7 +289,7 @@ Name: "game"; Description: "{#MyAppName}"; Types: full compact custom; Flags: fi
 #endif
 Name: "game\update"; Description: "Download {language} voices and campaigns"; Types: full compact; Languages: french german italian spanish russian chinese
 Name: "game\update"; Description: "**Try** to download {language} voices and campaigns"; Types: full compact; Languages: korean polish
-
+; ------------------
 Name: "gameaoc"; Description: "{#MyAppName} : AoC"; Types: full
 #if InstallType == "EE"
   Name: "gameaoc\gog"; Description: "Empire Earth : AoC from GOG (Better for recent Computer & GPU)"; Flags: exclusive; MinVersion: 0.0,6.1
@@ -302,6 +307,8 @@ Name: "gameaoc\update"; Description: "**Try** to download {language} voices and 
 Name: "additional"; Description: "Additional Recommended Content"
 Name: "additional\movies"; Description: "Game Intro"; Types: full
 Name: "additional\drexmod"; Description: "dreXmod 2 for better Camera, HUD and Lobby (by Yukon)"; Types: full compact; MinVersion: 0,5.1
+
+; ------------------
 
 Name: "additional\omega"; Description: "Omega Content";
 #if InstallType == "EE"
@@ -722,7 +729,7 @@ german.AntiVirusWarning=Es wird dringend empfohlen, dass Sie ihr Antivirenprogra
 italian.AntiVirusWarning=Si consiglia vivamente di disattivare l'AntiVirus prima dell'installazione.%nMa non dovreste incontrare alcun problema se non lo disattivate.
 spanish.AntiVirusWarning=Se recomienda encarecidamente desactivar el AntiVirus antes de la instalación.%nPero no deberías encontrar ningún problema si no lo deshabilitas.
 russian.AntiVirusWarning=Настоятельно рекомендуется отключить ваш антивирус перед установкой.%nНо вы не столкнетесь с какими-либо проблемами, если не отключите его.
-polish.AntiVirusWarning=Jest wysoce zalecane, aby wyłączyć AntiVirus przed instalacją.%nAle nie powinieneś napotkać żadnych problemów, jeśli go nie wyłączysz.
+polish.AntiVirusWarning=Mimo że nie powinieneś napotkać żadnych problemów podczas instalacji.%nZalecamy wyłączyć program antywirusowy przed rozpoczęciem instalacji, w celu uniknięcia dodatkowych problemów.
 chinese.AntiVirusWarning=强烈建议在安装前禁用你的反病毒软件。%n但如果你不禁用它，应该不会遇到任何问题。
 korean.AntiVirusWarning=설치하기 전에 바이러스 백신을 사용하지 않도록 설정하는 것이 좋습니다.%n그러나 비활성화하지 않으면 문제가 발생하지 않아야합니다.
 
@@ -733,7 +740,7 @@ german.LegalQuestion=Haben Sie das Originalspiel und seine Erweiterung (oder Gol
 italian.LegalQuestion=Hai il gioco originale e la sua espansione (o Gold Edition) su CD con chiavi valide o hai acquistato il gioco in digitale?
 spanish.LegalQuestion=¿Tienes el juego original y su expansión (o la Gold Edition) en CD con claves válidas o has comprado el juego digitalmente?
 russian.LegalQuestion=Есть ли у вас оригинальная игра и ее расширение (или Gold Edition) на CD с действующими ключами или вы приобрели игру в цифровом виде?
-polish.LegalQuestion=Czy posiadasz oryginalną grę i jej rozszerzenie (lub Gold Edycję) na CD z ważnymi kluczami, czy też zakupiłeś grę cyfrowo?
+polish.LegalQuestion=Czy posiadasz oryginalną grę i dodatek (lub Gold Edycję) na CD z kluczami instalacyjnymi, czy też zakupiłeś grę cyfrowo?
 chinese.LegalQuestion=你是否有原版游戏及其扩展版（或Gold版）的CD和有效的钥匙，或者你是通过数字方式购买游戏？
 korean.LegalQuestion=유효한 키가 있는 CD에 오리지널 게임과 확장(또는 Gold 에디션)이 있거나 디지털 방식으로 게임을 구입했습니까?
 
@@ -762,10 +769,10 @@ russian.PortableQuestion=В настоящее время вы запускае�
 %nУстановка в портативном режиме не может быть деинсталлирована, так как это просто копия файлов игры. \
 %nЕсли вы не знаете, что делаете, пожалуйста, используйте обычную версию программы установки. \
 %n%nВы хотите продолжить установку?
-polish.PortableQuestion=Właśnie uruchamiasz przenośną wersję instalatora. Ta wersja została stworzona, aby umożliwić Ci grę na urządzeniach przenośnych (USB). \
-%nInstalacji w trybie przenośnym nie można odinstalować, ponieważ jest to po prostu kopia plików gry. \
-Jeśli nie wiesz, co robisz, użyj normalnej wersji instalatora. \
-%n%nCzy chcesz kontynuować instalację?
+polish.PortableQuestion=Uruchomiłeś przenośną wersję instalatora. Ta wersja została stworzona, aby umożliwić Ci grę z pamięci przenośnej (USB). \
+%nInstalacji w trybie przenośnym nie można odinstalować za pomocą deinstalatora, ponieważ jest to po prostu kopia plików gry. \
+Jeśli nie jesteś pewien decyzji, zalecamy użycie normalnej wersji instalatora. \
+%n%nCzy chcesz kontynuować instalację w trybie przenośnym?
 chinese.PortableQuestion=你目前运行的是便携式版本的安装程序。这个版本是为了让你在可移动设备（USB）上播放。 \
 在便携式模式下的安装程序不能被卸载，因为它只是游戏文件的一个副本。 \
 %n如果你不知道你在做什么，请使用普通版本的安装程序。 \
@@ -788,8 +795,8 @@ spanish.GameUpdate=El juego incluido en esta configuración no está actualizado
 %n%n¿Quieres descargar la última versión?
 russian.GameUpdate=Игра, включенная в эту установку, не обновлена ({#MyAppVersion} => [LAST]), пожалуйста, обновите или ВЫ НЕ МОЖЕТЕ ИГРАТЬ С ДРУГИМИ ИГРОКАМИ. \
 %n%nВы хотите скачать последнюю версию?
-polish.GameUpdate=Gra dołączona do tej konfiguracji nie jest aktualna ({#MyAppVersion} => [LAST]), prosimy o aktualizację, w przeciwnym razie możesz nie być w stanie grać z innymi graczami. \
-%n%nCzy chcesz pobrać najnowszą wersję?
+polish.GameUpdate=Wersja gry znajdująca się w tym programie instalacyjnym jest nieaktualna ({#MyAppVersion} => [LAST]). Zalecamy aktualizację, w celu rozwiązania problemów i możliwości połączeń multiplayer z innymi graczami. \
+%n%nCzy chcesz pobrać teraz najnowszą wersję?
 chinese.GameUpdate=这个设置中包含的游戏不是最新的（{#MyAppVersion} => [LAST]），请更新，否则你可能无法与其他玩家一起玩。 \
 %n%n你想下载最新的版本吗？
 korean.GameUpdate=이 설정에 포함된 게임은 최신 상태({#MyAppVersion} => [LAST]) 최신 게임이 아니며, 업데이트해 주거나 다른 플레이어와 플레이할 수 없을 수도 있습니다. \
@@ -802,14 +809,14 @@ french.SetupUpdate=Le programme d'installation n'est pas à jour ({#MySetupVersi
 %n%nVoulez-vous télécharger la dernière version ?
 german.SetupUpdate=Das Installationsprogramm ist nicht auf dem neuesten Stand ({#MySetupVersion} => [LAST]). Es wird dringend empfohlen, die neueste Version zu verwenden, um von den neuesten Fehlerkorrekturen und Kompatibilitätsverbesserungen zu profitieren. \
 %n%nWollen Sie die neueste Version herunterladen?
-italian.SetupUpdate=Il programma di installazione non è aggiornato ({#MySetupVersion} => [LAST]), è fortemente raccomandato di usare l'ultima versione per beneficiare delle ultime correzioni e dei miglioramenti di compatibilità. \
+italian.SetupUpdate=Il programma di installazione non è aggiornato ({#MySetupVersion} => [LAST]), è fortemente consigliato di usare l'ultima versione per beneficiare delle ultime correzioni e dei miglioramenti di compatibilità. \
 %n%nVuoi scaricare l'ultima versione?
 spanish.SetupUpdate=El instalador no está actualizado ({#MySetupVersion} => [LAST]), se recomienda encarecidamente utilizar la última versión para beneficiarse de las últimas correcciones y mejoras de compatibilidad. \
 %n%n¿Desea descargar la última versión?
 russian.SetupUpdate=Программа установки не обновлена ({#MySetupVersion} => [LAST]), настоятельно рекомендуется использовать последнюю версию, чтобы воспользоваться последними исправлениями и улучшениями совместимости. \
 %n%nВы хотите скачать последнюю версию?
-polish.SetupUpdate=Instalator nie jest aktualny ({#MySetupVersion} => [LAST]), zdecydowanie zalecane jest użycie najnowszej wersji, aby skorzystać z najnowszych poprawek i ulepszeń kompatybilności. \
-%n%nCzy chcesz pobrać najnowszą wersję?
+polish.SetupUpdate=Wersja instalatora jest nieaktualna ({#MySetupVersion} => [LAST]). Wysoce zalecamy użycie najnowszej wersji w celu zastosowania najnowszych poprawek i ulepszonej kompatybilności. \
+%n%nCzy chcesz pobrać teraz najnowszą wersję instalatora?
 chinese.SetupUpdate=安装程序不是最新的（{#MySetupVersion} => [LAST]），强烈建议使用最新的版本以受益于最新的修复和兼容性改进。 \
 %n%n你想下载最新的版本吗？
 korean.SetupUpdate=설치 프로그램은 최신 ({#MySetupVersion} => [LAST]) 최신 버전의 혜택을 누리는 것이 좋습니다. \
@@ -841,9 +848,9 @@ russian.AlreadyInstalled=Кажется, что {#MyAppName} уже устано
 %nСохранения игры сохраняются при деинсталляции.  \
 %n%nВы хотите продолжить установку?
 polish.AlreadyInstalled=Wygląda na to, że {#MyAppName} został już zainstalowany. \
-%nZalecane jest odinstalowanie i zainstalowanie. \
-%nPodczas odinstalowywania zapisy gry zostają ZACHOWANE.  \
-%n%nCzy chcesz kontynuować instalację?
+%nZalecane jest ręczne odinstalowanie i ponowne uruchomienie programu instalacyjnego. \
+%nPodczas odinstalowywania zapisy gry zostają ZACHOWANE. \
+%n%nCzy mimo to, chcesz kontynuować instalację?
 chinese.AlreadyInstalled=似乎{#MyAppName}已经被安装了。 \
 建议您卸载并安装。 \
 %n当卸载时，游戏保存被保留。 \
@@ -868,7 +875,7 @@ spanish.PasswordLabel3=Por favor, introduzca '{#MySetupPassword}', y haga clic e
 spanish.IncorrectPassword=La contraseña ingresada no es correcta. Por favor, introduzca '{#MySetupPassword}'.
 russian.PasswordLabel3=Пожалуйста, напишите '{#MySetupPassword}' (с учетом регистра), затем нажмите Далее, чтобы продолжить.
 russian.IncorrectPassword=Введенный вами пароль неверен. Пожалуйста, введите '{#MySetupPassword}' (с учетом регистра).
-polish.PasswordLabel3=Wpisz '{#MySetupPassword}' (z uwzględnieniem wielkości liter), a następnie kliknij Next, aby kontynuować.
+polish.PasswordLabel3=Proszę wpisać '{#MySetupPassword}' (z uwzględnieniem wielkości liter), a następnie kliknąć 'Dalej', aby kontynuować.
 polish.IncorrectPassword=Wprowadzone hasło jest nieprawidłowe. Proszę wpisać '{#MySetupPassword}' (z uwzględnieniem wielkości liter).
 chinese.PasswordLabel3=请写上'{#MySetupPassword}'（区分大小写），然后点击下一步继续。
 chinese.IncorrectPassword=你输入的密码不正确。请输入'{#MySetupPassword}'（区分大小写）。
