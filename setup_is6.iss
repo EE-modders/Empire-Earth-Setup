@@ -1,12 +1,41 @@
 ﻿; ---------------------------------------
 ;         By EnergyCube 2020-2022
+;      Empire Earth Community Setup      
 ;     GNU General Public License v3.0
 ; ---------------------------------------
+;       EnergyCube: EnergyCube#7471
+;   Reborn : discord.com/invite/BjUXbFB
+; --------------------------------------- 
 
-; Note: Empire Earth is very sensitive to version change (which leads to multiplayer incompatibility),
-;       some modders might be interested in using this setup to deliver their mods. Please do not do
-;       this unless you have created a really popular and functional modpack. We must avoid creating
-;       multiple versions of the game to avoid fracturing the community.
+; Credit
+; ------
+; Translations : German   : xXxJannik#0001
+;                French   : EnergyCube#7471
+;                Others   : DeepL / DuckDuckGo Translator
+; External Dep. 
+;   InnoSetup Downloader Plugin, BASS
+; Additinal Content
+;   Omega (Patch & Neo Content Patch), yukon aka. drex (dreXmod)
+;   Dege (DX Wrapper: dgVoodoo), GOG (DX Wrapper)
+; Other Help
+;   CyrentiX#1219, xq_happy#7140, giord#4697
+;   And every members of EE:Reborn team :>
+
+
+;  Notes  | Empire Earth is very sensitive to version change (which leads to multiplayer incompatibility),
+;   for   | some modders might be interested in using this setup to deliver their mods. Please do not do
+; Modders | this unless you have created a really popular and functional modpack. We must avoid creating
+;         | multiple versions of the game to avoid fracturing the community.
+
+;  Notes  | Since the script is licensed under the GNU GPL v3 you have every right to modify the setup script
+;   for   | to generate your own versions, but you must also publish the source code of the script.
+;   Dev   | So I invite you to fork this project if you want and I pray you don't forget that we have to do
+;         | everything to unite the community around the world, if you have ideas of modifications to do don't
+;         | hesitate to make suggestions, I also invite you to make pull requests if you think you have done
+;         | something that deserves to be in this script. The version of the script I'm distributing should
+;         | become the standard to facilitate future installations. I hope you understand the objective and
+;         | how necessary and helpful it is for everyone.
+;         | If you think something is wrong, don't hesitate to tell me! 
 
 ; SETUP SETTINGS
 
@@ -59,6 +88,9 @@
   #error Unsupported Install Type
 #endif
 #define BaseRegCompatibility = "Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"
+
+; Audio
+#define AudioModule true
 
 ; TestID (0 if Release)
 # define TestID = 15
@@ -194,7 +226,7 @@ DirExistsWarning=no
     OutputBaseFilename={#InstallType}_Portable_v{#MyAppVersion}_Setup_v{#MySetupVersion}
   #endif
 #else
-# error Unsupported Install Mode
+  #error Unsupported Install Mode
 #endif
 
 [Languages]
@@ -205,7 +237,7 @@ Name: "italian"; MessagesFile: "compiler:Languages\Italian.isl"
 Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
 Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
 Name: "polish"; MessagesFile: "compiler:Languages\Polish.isl"
-Name: "portuguese_brazil"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl" 
+; Not enough files Name: "portuguese_brazil"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl" 
 Name: "chinese"; MessagesFile: "unofficial_isl\IS6\ChineseSimplified.isl" 
 Name: "korean"; MessagesFile: "unofficial_isl\IS6\Korean.isl"
 
@@ -298,6 +330,12 @@ Name: "civs\j2"; Description: "J2 Civilizations (19)"; Types: full compact
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 #if CertInclude
   Source: "./data/{#CertFileName}"; DestDir: "{tmp}"; DestName: "{#CertFileName}"; Flags: deleteafterinstall; Tasks: certinclude;
+#endif
+
+#if AudioModule
+  Source: "./bass/x86/bass.dll"; Flags: dontcopy; Check: not Is64BitInstallMode
+  Source: "./bass/x64/bass.dll"; Flags: dontcopy; Check: Is64BitInstallMode
+  Source: "./data/Loop.flac"; Flags: dontcopy
 #endif
 
 #if InstallType == "EE"
@@ -672,11 +710,15 @@ Type: files; Name: "{app}\Empire Earth - The Art of Conquest\_won*"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\_wonHTTPCache\*"
 Type: filesandordirs; Name: "{app}\Empire Earth - The Art of Conquest\_wonHTTPCache"
 
+
+; Translation Note
+; Many of the translations have been translated with a translator and are therefore
+; probably of poor quality. If you can check them and suggest improvements that's perfect!
 [CustomMessages]
 ; AntiVirus
 AntiVirusWarning=It is highly recommended to disable your AntiVirus before installation.%nBut you should not encounter any problems if you do not disable it.
 french.AntiVirusWarning=Il est fortement recommandé de désactiver votre antivirus avant l'installation.%nMais vous ne devriez pas rencontrer de problèmes si vous ne le désactivez pas.
-german.AntiVirusWarning=Es wird dringend empfohlen, Ihr AntiVirus Programm vor der Installation zu deaktivieren.%n Im Normalfall sollten Sie aber auch keine Probleme haben, wenn Sie es nicht deaktivieren.
+german.AntiVirusWarning=Es wird dringend empfohlen, dass Sie ihr Antivirenprogramm vor der Installation deaktivieren.%nIm Normalfall sollten Sie aber auch keine Probleme haben, wenn Sie es nicht deaktivieren.
 italian.AntiVirusWarning=Si consiglia vivamente di disattivare l'AntiVirus prima dell'installazione.%nMa non dovreste incontrare alcun problema se non lo disattivate.
 spanish.AntiVirusWarning=Se recomienda encarecidamente desactivar el AntiVirus antes de la instalación.%nPero no deberías encontrar ningún problema si no lo deshabilitas.
 russian.AntiVirusWarning=Настоятельно рекомендуется отключить ваш антивирус перед установкой.%nНо вы не столкнетесь с какими-либо проблемами, если не отключите его.
@@ -704,8 +746,8 @@ french.PortableQuestion=Vous utilisez actuellement la version portable de l'inst
 %nUne installation en mode portable ne peut pas être désinstallée, car il s'agit simplement d'une copie des fichiers du jeu. \
 %nSi vous ne savez pas ce que vous faites, veuillez utiliser la version normal de l'installateur. \
 %n%nSouhaitez-vous poursuivre l'installation ?
-german.PortableQuestion=Sie führen gerade die portable Version des Installationsprogramms aus. Diese Version wurde entwickelt, damit Sie auf Wechseldatenträgern (USB) spielen können. \
-%nEine Installation im portablen Modus kann nicht deinstalliert werden, da es sich lediglich um eine Kopie der Spieldateien handelt. \
+german.PortableQuestion=Sie führen gerade die tragbare Version des Installationsprogramms aus. Diese Version wurde entwickelt, damit Sie auf Wechseldatenträgern (USB) spielen können. \
+%nEine Installation im tragbaren Modus kann nicht deinstalliert werden, da es sich lediglich um eine Kopie der Spieldateien handelt. \
 %nWenn Sie nicht wissen, was Sie tun, verwenden Sie bitte die normale Version des Installationsprogramms. \
 %n%nMöchten Sie die Installation fortsetzen?
 italian.PortableQuestion=Attualmente stai eseguendo la versione portatile del programma di installazione. Questa versione è fatta per permetterti di giocare su dispositivi rimovibili (USB). \
@@ -738,7 +780,7 @@ GameUpdate=The game included in this setup is not up to date ({#MyAppVersion} =>
 %n%nWould you like to download the latest version?
 french.GameUpdate=Le jeu inclus dans cette installation n'est pas à jour ({#MyAppVersion} => [LAST]), veuillez le mettre à jour ou VOUS POURRIEZ NE PAS ÊTRE EN MESURE DE JOUER AVEC D'AUTRES JOUEURS. \
 %n%nVoulez-vous télécharger la dernière version ?
-german.GameUpdate=Das in diesem Setup enthaltene Spiel ist nicht auf dem neuesten Stand ({#MyAppVersion} => [LAST]), bitte aktualisieren Sie es, sonst können Sie möglicherweise nicht mit anderen Spielern spielen. \
+german.GameUpdate=Das in diesem Installationsprogramm enthaltene Spiel ist nicht auf dem neuesten Stand ({#MyAppVersion} => [LAST]), bitte aktualisieren Sie es, SONST KÖNNEN SIE MÖGLICHERWEISE NICHT MIT ANDEREN SPIELERN SPIELEN. \
 %n%nWollen Sie die neueste Version herunterladen?
 italian.GameUpdate=Il gioco incluso in questo setup non è aggiornato ({#MyAppVersion} => [LAST]), per favore aggiorna o potresti non essere in grado di giocare con altri giocatori. \
 %n%nVuoi scaricare l'ultima versione?
@@ -758,8 +800,8 @@ SetupUpdate=The setup is not up to date ({#MySetupVersion} => [LAST]), it is str
 %n%nWould you like to download the latest version?
 french.SetupUpdate=Le programme d'installation n'est pas à jour ({#MySetupVersion} => [LAST]), il est fortement recommandé d'utiliser la dernière version pour bénéficier des dernières corrections et améliorations de compatibilité. \
 %n%nVoulez-vous télécharger la dernière version ?
-german.SetupUpdate=Das Installationsprogramm ist nicht auf dem neuesten Stand ({#MySetupVersion} => [LAST]). Es wird dringend empfohlen, die neueste Version zu verwenden, um von den neuesten Korrekturen und Kompatibilitätsverbesserungen zu profitieren. \
-%n%nMöchten Sie die neueste Version herunterladen?
+german.SetupUpdate=Das Installationsprogramm ist nicht auf dem neuesten Stand ({#MySetupVersion} => [LAST]). Es wird dringend empfohlen, die neueste Version zu verwenden, um von den neuesten Fehlerkorrekturen und Kompatibilitätsverbesserungen zu profitieren. \
+%n%nWollen Sie die neueste Version herunterladen?
 italian.SetupUpdate=Il programma di installazione non è aggiornato ({#MySetupVersion} => [LAST]), è fortemente raccomandato di usare l'ultima versione per beneficiare delle ultime correzioni e dei miglioramenti di compatibilità. \
 %n%nVuoi scaricare l'ultima versione?
 spanish.SetupUpdate=El instalador no está actualizado ({#MySetupVersion} => [LAST]), se recomienda encarecidamente utilizar la última versión para beneficiarse de las últimas correcciones y mejoras de compatibilidad. \
@@ -783,9 +825,9 @@ french.AlreadyInstalled=Il semble que {#MyAppName} ait déjà été installé. \
 %nLes sauvegardes de jeu sont CONSERVÉES lors de la désinstallation.  \
 %n%nVoulez-vous continuer l'installation ?
 german.AlreadyInstalled=Es scheint, dass {#MyAppName} bereits installiert wurde. \
-%nEs wird empfohlen, dass Sie deinstallieren und installieren. \
+%nEs wird empfohlen, dass Sie deinstallieren und neuinstallieren. \
 %nSpielstände werden bei der Deinstallation BEHALTEN.  \
-%n%nMöchten Sie die Installation fortsetzen?
+%n%nWollen Sie die Installation fortsetzen?
 italian.AlreadyInstalled=Sembra che {#MyAppName} sia già stato installato. \
 %nSi raccomanda di disinstallare e installare. \
 %nI salvataggi di gioco vengono CONSERVATI quando si disinstalla.  \
@@ -818,7 +860,7 @@ PasswordLabel3=Please write '{#MySetupPassword}' (case-sensitive), then click Ne
 IncorrectPassword=The password you entered is not correct. Please enter '{#MySetupPassword}' (case-sensitive).
 french.PasswordLabel3=Veuillez saisir '{#MySetupPassword}' (attention à la distinction entre majuscules et minuscules) puis cliquez sur Suivant pour continuer.
 french.IncorrectPassword=Le mot de passe saisi n'est pas valide. Merci de saisir '{#MySetupPassword}'.
-german.PasswordLabel3=Bitte geben Sie '{#MySetupPassword}' ein, und klicken Sie danach auf Weiter. Achten Sie auf korrekte Groß-/Kleinschreibung. 
+german.PasswordLabel3=Bitte geben Sie '{#MySetupPassword}' ein, und klicken Sie danach auf Weiter. Achten Sie auf korrekte Groß- und Kleinschreibung. 
 german.IncorrectPassword=Das eingegebene Passwort ist nicht korrekt. Bitte geben Sie '{#MySetupPassword}' noch einmal ein.
 italian.PasswordLabel3=Inserire '{#MySetupPassword}', poi premere Avanti per continuare. Le password sono sensibili alle maiuscole/minuscole.
 italian.IncorrectPassword=La password inserita non è corretta, riprovare. Inserisci '{#MySetupPassword}'.
@@ -834,8 +876,8 @@ chinese.IncorrectPassword=你输入的密码不正确。请输入'{#MySetupPassw
 [Run]
 ; Add Cert in Windows Trusted Root CA Store
 #if SignSetup
-  Filename: "{sys}\certutil.exe"; Parameters: "-addstore root ""{tmp}\{#CertFileName}"""; Flags: runhidden; Tasks: certinclude; StatusMsg: "Adding Empire Earth Community Certificate Authority (issued by EnergyCube)"; \
-  MinVersion: 0,6.0; Components: game; Check: IsAdminInstallMode
+  Filename: "{sys}\certutil.exe"; Parameters: "-addstore root ""{tmp}\{#CertFileName}"""; Flags: runhidden; Tasks: certinclude; \
+    StatusMsg: "Adding Empire Earth Community Certificate Authority (issued by EnergyCube)"; MinVersion: 0,6.0; Components: game; Check: IsAdminInstallMode
 #endif
 
 ; Install DirectPlay (Never tested on x86) ({sys}\dism.exe should work)
@@ -899,16 +941,16 @@ Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram program=""
 
 #if InstallType == "NeoEE"
   Filename: "{tmp}\authtools.exe"; Parameters: "-eec={app}\Empire Earth, -authserv=neoee.net, -port=10003"; Flags: runhidden; \
-  StatusMsg: "Register Empire Earth NeoEE CDKey"; MinVersion: 0,5.0; Tasks: neoee_cdkeys; Components: game; Check: IsAdminInstallMode
+    StatusMsg: "Register Empire Earth NeoEE CDKey"; MinVersion: 0,5.0; Tasks: neoee_cdkeys; Components: game; Check: IsAdminInstallMode
   Filename: "{tmp}\authtools.exe"; Parameters: "-eec={app}\Empire Earth, -aoc={app}\Empire Earth - The Art of Conquest, -authserv=neoee.net, -port=10003"; Flags: runhidden; \
-  StatusMsg: "Register Empire Earth Neo EE & AoC CDKey"; MinVersion: 0,5.0; Tasks: neoee_cdkeys; Components: gameaoc; Check: IsAdminInstallMode
+    StatusMsg: "Register Empire Earth Neo EE & AoC CDKey"; MinVersion: 0,5.0; Tasks: neoee_cdkeys; Components: gameaoc; Check: IsAdminInstallMode
 #endif
 
 [UninstallRun]
 #if SignSetup
   ; Remove Cert from Windows Trusted Root CA Store
   Filename: "{sys}\certutil.exe"; Parameters: "-delstore root ""{#CertHashSHA1}"""; Flags: runhidden; Tasks: certinclude; \
-  StatusMsg: "Removing Empire Earth Community Certificate Authority (issued by EnergyCube)"; MinVersion: 6.0; Components: game; Check: IsAdminInstallMode
+    StatusMsg: "Removing Empire Earth Community Certificate Authority (issued by EnergyCube)"; MinVersion: 6.0; Components: game; Check: IsAdminInstallMode
 #endif
 
 ; Uninstall DirectPlay
@@ -950,6 +992,35 @@ const
   SetupVersionURL = 'http://storage.empireearth.eu/setup/game/neo/setup.version';
 #else
   #error "Update not supported !"
+#endif
+
+// Audio Module
+#if AudioModule
+  const  
+    BASS_SAMPLE_LOOP = 4;
+    BASS_UNICODE = $80000000;
+    BASS_CONFIG_GVOL_STREAM = 7;
+  const
+    #ifndef UNICODE
+      EncodingFlag = 0;
+    #else
+      EncodingFlag = BASS_UNICODE;
+    #endif
+  type
+    HSTREAM = DWORD;
+
+  function BASS_Init(device: LongInt; freq, flags: DWORD; 
+    win: HWND; clsid: Cardinal): BOOL;
+    external 'BASS_Init@files:bass.dll stdcall';
+  function BASS_StreamCreateFile(mem: BOOL; f: string; offset1: DWORD; 
+    offset2: DWORD; length1: DWORD; length2: DWORD; flags: DWORD): HSTREAM;
+    external 'BASS_StreamCreateFile@files:bass.dll stdcall';
+  function BASS_ChannelPlay(handle: DWORD; restart: BOOL): BOOL; 
+    external 'BASS_ChannelPlay@files:bass.dll stdcall';
+  function BASS_SetConfig(option: DWORD; value: DWORD ): BOOL;
+    external 'BASS_SetConfig@files:bass.dll stdcall';
+  function BASS_Free: BOOL;
+    external 'BASS_Free@files:bass.dll stdcall';
 #endif
 
 type
@@ -1215,6 +1286,13 @@ begin
       + #13#10 + 'They will get a game version error message.', mbInformation, MB_OK);
   end;
 end;
+
+procedure DeinitializeSetup;
+begin
+  #if AudioModule
+    BASS_Free;
+  #endif
+end;
  
 procedure InitializeWizard;
 var
@@ -1222,7 +1300,23 @@ var
   Diff: double;
   ScrWidth: double;
   ScrHeight: double;
+  #if AudioModule
+    StreamHandle: HSTREAM;
+  #endif
+
 begin
+  
+  #if AudioModule
+    ExtractTemporaryFile('Loop.flac');
+    if BASS_Init(-1, 44100, 0, 0, 0) then
+    begin
+      StreamHandle := BASS_StreamCreateFile(False, 
+        ExpandConstant('{tmp}\Loop.flac'), 0, 0, 0, 0, 
+        EncodingFlag or BASS_SAMPLE_LOOP);
+      BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, 2500);
+      BASS_ChannelPlay(StreamHandle, False);
+    end;  
+  #endif
 
   BackgroundImage := TBitmapImage.Create(MainForm);
   BackgroundImage.Parent := MainForm;
