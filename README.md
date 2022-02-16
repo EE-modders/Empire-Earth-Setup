@@ -5,17 +5,17 @@
 # 📥 Empire Earth Community Setup
 
 ## Features
-🎮 Empire Earth & The Art of Conquest
-🌐 NeoEE (with CD Keys generation)
-🗺️ Support 11 languages
-📥 Download localized content online (support mirror)
-✅ Online update checker (support mirror)
-🖥️ DirectX Wrapper (DX9 with GOG dll and DX12 with dgVoodoo dll)
-🪛 Better compatibility with additonal flags
-➕ More maps and HD Textures (preview) 
-🔥 Registered in Firewall (Admin)  
-📥 DirectX 9 Install (when using DirectX Wrapper for DirectX 9) 
-🔐 Digitally signed
+🎮 Empire Earth & The Art of Conquest\
+🌐 NeoEE (with CD Keys generation)\
+🗺️ Support 11 languages\
+📥 Download localized content online (support mirror)\
+✅ Online update checker (support mirror)\
+🖥️ DirectX Wrapper (DX9 with GOG dll and DX12 with dgVoodoo dll)\
+🪛 Better compatibility with additonal flags\
+➕ More maps and HD Textures (preview)\
+🔥 Registered in Firewall (Admin)\
+📥 DirectX 9 Install (when using DirectX Wrapper for DirectX 9)\
+🔐 Digitally signed\
 
 ## Notes for Modders
 Empire Earth is very sensitive to version change (which leads to multiplayer incompatibility), some modders might be interested in using this setup to deliver their mods. Please do not do this unless you have created a really popular and functional modpack. We must avoid creating multiple versions of the game to avoid fracturing the community.
