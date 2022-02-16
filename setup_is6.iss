@@ -22,8 +22,8 @@
 ; External Dep. 
 ;   InnoSetup Downloader Plugin (download files + support mirrors), BASS (audio module)
 ; Additinal Content
-;   Omega (Patch & Neo Content Patch), yukon aka. drex (dreXmod)
-;   Dege (DX Wrapper: dgVoodoo), GOG (DX Wrapper)
+;   Omega (Patch & Neo Content Patch), yukon aka. drex (dreXmod.dll)
+;   Dege (DX Wrapper: dgVoodoo), GOG (DX Wrapper), zocker_160 & EnergyCube (Reborn.dll)
 ; Other Help
 ;   CyrentiX#1219 (Compatibility), xq_happy#7140 (Compatibility & Chinese files)
 ;   giord#4697 (Content), IvaN#9233 (Spanish files), FC_Fan#8831 (Russian files)
@@ -43,7 +43,32 @@
 ;         | become the standard to facilitate future installations. I hope you understand the objective and
 ;         | how necessary and helpful it is for everyone.
 ;         | If you think something is wrong, don't hesitate to tell me!
-; --------------------------------------- 
+; ---------------------------------------
+;              Release Note
+; ---------------------------------------
+; 1.0.0.0 | Initial Version
+;         |------------------------------
+;         | EE & AoC (in 11 languages)    
+;         | Support NeoEE, dreXmod, Omega content 
+;         | Support NeoEE CDKey generation (Admin)
+;         | Download localized content online (support mirror)
+;         | Online update checker (support mirror)
+;         | DirectX Wrapper (DX9 with GOG dll and DX12 with dgVoodoo dll)
+;         | Better compatibility with additonal flags
+;         | HD Content with FortuKing textures 
+;         | Registered in Firewall (Admin)  
+;         | DirectX 9 Install (when using DirectX Wrapper for DirectX 9) 
+;         | Removable Movies
+;         | Digitally signed
+;         |------------------------------
+;         | DX11 (API 10 & 11) has been disabled. It is obviously impossible to fix the bug related to the
+;         | full screen of the lobby (which puts the main window in window).
+;         | Reborn.dll is currently disabled because of a bug that makes it unusable with dgVoodoo (or makes
+;         | the window bug occur even with DirectX 12).
+;         | Since after analysis the binaries of GOG and the one of the 2002 Empire Earth crack are identical
+;         | the installation mode of the GOG binary has been removed since it is useless (its equivalent is to
+;         | simply use the DirectX Wrapper of DirectX 9)
+; ---------------------------------------  
 
 ; SETUP SETTINGS
 
@@ -83,11 +108,11 @@
 
 ; Regedit
 #if InstallType == "EE"
-  #define BaseRegEE = "Software\SSSI"
-  #define BaseRegAoC = "Software\Mad Doc Software"
+  #define BaseRegEE = "Software\SSSI\Empire Earth"
+  #define BaseRegAoC = "Software\Mad Doc Software\EE-AOC"
 #elif InstallType == "NeoEE"
-  #define BaseRegEE = "Software\Neo"
-  #define BaseRegAoC = "Software\Neo"
+  #define BaseRegEE = "Software\Neo\Art of Conquest"
+  #define BaseRegAoC = "Software\Neo\Empire Earth"
 #else
   #error Unsupported Install Type
 #endif
@@ -101,7 +126,7 @@
 #define AudioModule true
 
 ; TestID (0 if Release)
-# define TestID = 15
+# define TestID = 0
 
 ; END SETUP SETTINGS
 
@@ -181,7 +206,7 @@ ArchitecturesAllowed=x86 x64
 ; Avoid reg redirections...
 ; https://jrsoftware.org/ishelp/index.php?topic=registrysection
 ArchitecturesInstallIn64BitMode=x64     
-WizardImageFile=./EnergyWizardImageFile.bmp
+WizardImageFile=./SetupBanner.bmp
 WindowVisible=True
 WindowResizable=False
 WindowShowCaption=False
@@ -190,10 +215,8 @@ DirExistsWarning=no
 
 #ifdef UNICODE
   WizardStyle=modern
-  UninstallStyle=modern
 #else
   WizardStyle=classic
-  UninstallStyle=classic
 #endif
 
 ; Warning for MinVersion < 6.1sp1
@@ -245,8 +268,8 @@ DirExistsWarning=no
 #include <idplang\French.iss>
 #include <idplang\Italian.iss>
 #include <idplang\Polish.iss>
-#include <idplang\ChineseSimplified.iss>
-// #include <idplang\BrazilianPortuguese.iss>
+#include <idplang\Chinese.iss>
+#include <idplang\BrazilianPortuguese.iss>
 #include <idplang\Russian.iss>
 #include <idplang\Spanish.iss>
 
@@ -258,14 +281,15 @@ Name: "italian"; MessagesFile: "compiler:Languages\Italian.isl"
 Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
 Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
 Name: "polish"; MessagesFile: "compiler:Languages\Polish.isl"
-; Not enough files Name: "portuguese_brazil"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl" 
-Name: "chinese"; MessagesFile: "unofficial_isl\IS6\ChineseSimplified.isl" 
+Name: "portuguese_brazil"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl" 
+Name: "chinese"; MessagesFile: "unofficial_isl\IS6\ChineseSimplified.isl"
+Name: "chinese_traditional"; MessagesFile: "unofficial_isl\IS6\ChineseTraditional.isl" 
 Name: "korean"; MessagesFile: "unofficial_isl\IS6\Korean.isl"
 
 [Tasks] 
 Name: "compatibilityflags"; Description: "Add compatibility flags"; MinVersion: 0.0,5.1;
 Name: "firewallexception"; Description: "Add Empire Earth in the FireWall"; MinVersion: 0.0,5.0; Check: IsAdminInstallMode
-; GOG Setup DirectPlay but i don't think it's really important... some kind of default install for old DX game maybe
+; GOG Setup install DirectPlay but i don't think it's really important... some kind of default install for old DX game maybe
 ; Name: "directplay"; Description: "Install DirectPlay to improve compatibility"; MinVersion: 6.2; Check: IsAdminInstallMode
 #if InstallType == "NeoEE"
   ; NeoEE patch read the CDKey in LM making non-admin unnable to register and play...
@@ -287,48 +311,25 @@ Name: "everyoneadminstart"; Description: "Require administrator rights for all u
 #endif
 
 [Components]
-; Duplicate have a different tag : MinVersion and OnlyBelowVersion
-; This allow use to set some kind of 'priority' for GOG on >=W7 and Retail on <W7
 Name: "game"; Description: "{#MyAppName}"; Types: full compact custom; Flags: fixed
-#if InstallType == "EE"
-  Name: "game\gog"; Description: "Empire Earth from GOG (Better for recent Computer & GPU)"; Flags: exclusive; MinVersion: 0.0,6.1
-  Name: "game\retail"; Description: "Empire Earth from Sierra (Better for old Computer & GPU)"; Flags: exclusive; MinVersion: 0.0,6.1
-  Name: "game\retail"; Description: "Empire Earth from Sierra (Better for old Computer & GPU)"; Flags: exclusive; OnlyBelowVersion: 0.0,6.1
-  Name: "game\gog"; Description: "Empire Earth from GOG (Better for recent Computer & GPU)"; Flags: exclusive; OnlyBelowVersion: 0.0,6.1
-#elif InstallType == "NeoEE"
-  Name: "game\neo"; Description: "NeoEE from GOG (Better for recent Computer & GPU)"; Flags: exclusive; MinVersion: 0.0,6.1 
-  Name: "game\neo_old"; Description: "NeoEE from Old GOG (Better for old Computer & GPU)"; Flags: exclusive; MinVersion: 0.0,6.1 
-  Name: "game\neo_old"; Description: "NeoEE from Old GOG (Better for old Computer & GPU)"; Flags: exclusive; OnlyBelowVersion: 0.0,6.1
-  Name: "game\neo"; Description: "NeoEE from GOG (Better for recent Computer & GPU)"; Flags: exclusive; OnlyBelowVersion: 0.0,6.1 
-#endif
-Name: "game\update"; Description: "Download {language} voices and campaigns"; Types: full compact; Languages: french german italian spanish russian chinese
-Name: "game\update"; Description: "**Try** to download {language} voices and campaigns"; Types: full compact; Languages: korean polish
+Name: "game\update"; Description: "Download {language} voices and campaigns"; Types: full compact; Flags: disablenouninstallwarning; Languages: french german italian spanish russian 
+Name: "game\update"; Description: "**Try** to download {language} voices and campaigns"; Types: full compact; Flags: disablenouninstallwarning;  Languages: chinese chinese_traditional korean polish portuguese_brazil
 ; ------------------
 Name: "gameaoc"; Description: "{#MyAppName} : AoC"; Types: full
-#if InstallType == "EE"
-  Name: "gameaoc\gog"; Description: "Empire Earth : AoC from GOG (Better for recent Computer & GPU)"; Flags: exclusive; MinVersion: 0.0,6.1
-  Name: "gameaoc\retail"; Description: "Empire Earth : AoC from Sierra (Better for very old Computer & GPU)"; Flags: exclusive; MinVersion: 0.0,6.1
-  Name: "gameaoc\retail"; Description: "Empire Earth : AoC from Sierra (Better for very old Computer & GPU)"; Flags: exclusive; OnlyBelowVersion: 0.0,6.1
-  Name: "gameaoc\gog"; Description: "Empire Earth : AoC from GOG (Better for recent Computer & GPU)"; Flags: exclusive; OnlyBelowVersion: 0.0,6.1
-#elif InstallType == "NeoEE"
-  Name: "gameaoc\neo"; Description: "NeoEE : AoC from GOG (Better for old Computer & GPU)"; Flags: exclusive; MinVersion: 0.0,6.1
-  Name: "gameaoc\neo_old"; Description: "NeoEE : AoC from Old GOG (Better for old Computer & GPU)"; Flags: exclusive; MinVersion: 0.0,6.1
-  Name: "gameaoc\neo"; Description: "NeoEE : AoC from GOG (Better for old Computer & GPU)"; Flags: exclusive; OnlyBelowVersion: 0.0,6.1
-  Name: "gameaoc\neo_old"; Description: "NeoEE : AoC from Old GOG (Better for old Computer & GPU)"; Flags: exclusive; OnlyBelowVersion: 0.0,6.1
-#endif
-Name: "gameaoc\update"; Description: "Download {language} voices and campaigns"; Types: full; Languages: french german italian spanish russian
-Name: "gameaoc\update"; Description: "**Try** to download {language} voices and campaigns"; Types: full; Languages: chinese korean polish
+Name: "gameaoc\update"; Description: "Download {language} voices and campaigns"; Types: full; Flags: disablenouninstallwarning; Languages: french german italian spanish
+Name: "gameaoc\update"; Description: "**Try** to download {language} voices and campaigns"; Flags: disablenouninstallwarning;  Types: full compact; Languages: russian chinese chinese_traditional korean polish portuguese_brazil
 
 ; ------------------
 
 Name: "additional"; Description: "Additional Recommended Content"
-Name: "additional\movies"; Description: "Game Intro"; Types: full
-Name: "additional\hd"; Description: "HD Textures"; Types: full
-Name: "additional\hd\terrain"; Description: "HD Terrain (by sleeper)"; Types: full
-Name: "additional\hd\buildings"; Description: "HD Buildings Icons (by Fortuking)"; Types: full
-Name: "additional\hd\tech"; Description: "HD Tech Icons (by Fortuking)"; Types: full
-Name: "additional\hd\effects"; Description: "HD Effects (by Fortuking)"; Types: full
-Name: "additional\drexmod"; Description: "dreXmod 2 for better Camera, HUD and Lobby (by Yukon)"; Types: full compact; MinVersion: 0,5.1
+Name: "additional\movies"; Description: "Game Intro"; Flags: disablenouninstallwarning; Types: full
+Name: "additional\hd"; Description: "HD Textures"; Flags: disablenouninstallwarning; Types: full
+Name: "additional\hd\terrain"; Description: "HD Terrain v1.0 (by sleeper)"; Types: full
+Name: "additional\hd\buildings"; Description: "HD Buildings Icons v2.3 (by Fortuking)"; Types: full
+Name: "additional\hd\tech"; Description: "HD Tech Icons v2.1 (by Fortuking)"; Types: full
+Name: "additional\hd\effects"; Description: "HD Effects WIP (by Fortuking)"; Types: full
+Name: "additional\drexmod"; Description: "dreXmod.dll v2 for better Camera, HUD and Lobby (by Yukon)"; Flags: disablenouninstallwarning; Types: full compact; MinVersion: 0,5.1
+; Name: "additional\reborn"; Description: "Reborn.dll v0.1 for better Camera, Resolution and Solo Max Units"; Flags: disablenouninstallwarning; Types: full compact; MinVersion: 0,5.1
 Name: "additional\omega"; Description: "Omega Content";
 #if InstallType == "EE"
   ; no_db allow to keep compatibility with full retail (because any db edit change EE version)
@@ -339,18 +340,18 @@ Name: "additional\omega"; Description: "Omega Content";
   Name: "additional\omega\neo"; Description: "Omega Neo Content for more Maps, Max Pop and Starting Resources"; Types: compact full custom; Flags: fixed
 #endif
 
-Name: "additional\dgvoodoo"; Description: "DirectX Wrapper (+compatibility and sometime +performance)"; MinVersion: 0.0,6.1
-Name: "additional\dgvoodoo\gog"; Description: "DirectX 9 GOG (Windows XP+) [Generally Recommended]"; Flags: exclusive; MinVersion: 0.0,6.1
-Name: "additional\dgvoodoo\dx11_lvl10"; Description: "DirectX 11 [API lvl.10] Official v2.71.3 (Windows 7&+)"; Flags: exclusive; MinVersion: 0.0,6.1
-Name: "additional\dgvoodoo\dx11_lvl11"; Description: "DirectX 11 [API lvl.11] Official v2.71.3 (Windows 7&+)"; Flags: exclusive; MinVersion: 0.0,6.1
-Name: "additional\dgvoodoo\dx12_lvl11"; Description: "DirectX 12 [API lvl.11] Official v2.71.3 (Windows 10&+)"; Flags: exclusive; MinVersion: 0.0,10;
-Name: "additional\dgvoodoo\dx12_lvl12"; Description: "DirectX 12 [API lvl.12] Official v2.71.3 (Windows 10&+)"; Flags: exclusive; MinVersion: 0.0,10;
+Name: "additional\directx_wrapper"; Description: "DirectX Wrapper (+compatibility and sometime +performance)"; Flags: disablenouninstallwarning; MinVersion: 0.0,6.1
+Name: "additional\directx_wrapper\dx9"; Description: "DirectX 9 (Windows XP&+) [Generally Recommended]"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
+; Name: "additional\directx_wrapper\dx11_lvl10"; Description: "DirectX 11 API lvl.10 v2.71.3 (Windows 7&+)"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
+; Name: "additional\directx_wrapper\dx11_lvl11"; Description: "DirectX 11 API lvl.11 v2.71.3 (Windows 7&+)"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
+Name: "additional\directx_wrapper\dx12_lvl11"; Description: "DirectX 12 API lvl.11 v2.71.3 (Windows 10&+)"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,10;
+Name: "additional\directx_wrapper\dx12_lvl12"; Description: "DirectX 12 API lvl.12 v2.71.3 (Windows 10&+)"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,10;
 
-Name: "additional\discord"; Description: "Discord Presence"; Types: full compact; MinVersion: 0.0,6.1
-Name: "civs"; Description: "Civilizations"
-Name: "civs\ec"; Description: "eC Standard Civilizations (25)"; Types: full compact
-Name: "civs\ec_full"; Description: "eC Full Civilizations (71)"
-Name: "civs\j2"; Description: "J2 Civilizations (19)"; Types: full compact
+Name: "additional\discord"; Description: "Discord Presence"; Flags: disablenouninstallwarning; Types: full compact; MinVersion: 0.0,6.1
+Name: "additional\civs"; Description: "Civilizations"
+Name: "additional\civs\ec"; Description: "eC Standard Civilizations (25)"; Types: full compact
+Name: "additional\civs\ec_full"; Description: "eC Full Civilizations (71)"
+Name: "additional\civs\j2"; Description: "J2 Civilizations (19)"; Types: full compact
 
 [Files]   
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
@@ -373,6 +374,8 @@ Name: "civs\j2"; Description: "J2 Civilizations (19)"; Types: full compact
   Source: "./SetupBackground-16-9-Neo.bmp"; DestDir: "{tmp}"; DestName: "SetupBackground-16-9.bmp"; Flags: deleteafterinstall dontcopy noencryption
 #endif
 
+Source: "./data/Add-on/Runtime/DirectX_9/*"; DestDir: "{tmp}/DirectX_9"; Flags: deleteafterinstall ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx9; Check: IsAdminInstallMode
+
 ; ---------------- 
 
 ; EE Base
@@ -380,16 +383,8 @@ Source: "./data/Empire Earth Base/Empire Earth/*"; DestDir: "{app}\Empire Earth"
 ; EE Movies
 Source: "./data/Add-on/Movies/EE/*"; DestDir: "{app}\Empire Earth\Data\Movies"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\movies and game;
 
-; EE Retail or GOG
-; Retail Mini = Retail Exe
-; GOG Mini = GOG Exe + GOG DLL (inc. DDraw (or crash))
-; GOG Old Mini = GOG Exe + GOG DLL (without DDraw (but support it))
-#if InstallType == "EE"
-  Source: "./data/Empire Earth Retail Mini - Energy/Empire Earth/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game\retail
-  Source: "./data/Empire Earth GOG Mini - Energy/Empire Earth/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game\gog
-#elif InstallType == "NeoEE"
+#if InstallType == "NeoEE"
   Source: "./data/NeoEE Base/Empire Earth/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game
-  Source: "./data/NeoEE GOG Mini - Energy/Empire Earth/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game\neo
   Source: "./data/NeoEE - CDkeys/authtools.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall ignoreversion recursesubdirs createallsubdirs; Components: game
   Source: "./data/NeoEE - CDkeys/_wonkver.pub"; DestDir: "{app}\Empire Earth"; Flags: deleteafterinstall ignoreversion recursesubdirs createallsubdirs; Components: game
   ; NeoEE - Wine Fix (GDI)
@@ -405,28 +400,31 @@ Source: "{tmp}\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recurs
 ; Soon deprecated by drex 3 that will most probably not included in the setup because it could split community
 ; Also Reborn Dll will soon replace the main functions of drex 2
 ; Yukon s'il te plait, partage ton code et faisons avancer le communauté ensemble, sérieusement ça n'a aucun sens nous somme si peu de dev...
-Source: "./data/Add-on/dreXmod/2/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\drexmod and game; 
+Source: "./data/Add-on/DLLs/dreXmod/2/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\drexmod and game; 
 ; Omega
 Source: "./data/Add-on/Omega/EE/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: (additional\omega\no_db or additional\omega\neo) and game
 ; Maybe te delete later, but it add some fun
 Source: "./data/Add-on/Omega_Neo/EE/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\omega\neo and game
 
 ; dgVoodoo  Bin
-Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_bin/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\dgvoodoo and game and not additional\dgvoodoo\gog 
-Source: "./data//Add-on/DirectX_Wrapper/GOG/DDraw.dll"; DestDir: "{app}\Empire Earth"; DestName: "DDraw.dll"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\dgvoodoo\gog and game;
+Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_bin/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper and game and not additional\directx_wrapper\dx9 
+Source: "./data//Add-on/DirectX_Wrapper/GOG/DDraw.dll"; DestDir: "{app}\Empire Earth"; DestName: "DDraw.dll"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx9 and game;
 ; dgVoodoo Conf
-Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX11_LVL10.conf"; DestDir: "{app}\Empire Earth"; DestName: "dgVoodoo.conf"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\dgvoodoo\dx11_lvl10 and game;
-Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX11_LVL11.conf"; DestDir: "{app}\Empire Earth"; DestName: "dgVoodoo.conf"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\dgvoodoo\dx11_lvl11 and game;
-Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX12_LVL11.conf"; DestDir: "{app}\Empire Earth"; DestName: "dgVoodoo.conf"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\dgvoodoo\dx12_lvl11 and game;
-Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX12_LVL12.conf"; DestDir: "{app}\Empire Earth"; DestName: "dgVoodoo.conf"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\dgvoodoo\dx12_lvl12 and game; 
+; Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX11_LVL10.conf"; DestDir: "{app}\Empire Earth"; DestName: "dgVoodoo.conf"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx11_lvl10 and game;
+; Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX11_LVL11.conf"; DestDir: "{app}\Empire Earth"; DestName: "dgVoodoo.conf"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx11_lvl11 and game;
+Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX12_LVL11.conf"; DestDir: "{app}\Empire Earth"; DestName: "dgVoodoo.conf"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx12_lvl11 and game;
+Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX12_LVL12.conf"; DestDir: "{app}\Empire Earth"; DestName: "dgVoodoo.conf"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx12_lvl12 and game; 
 
 ; Civs
-Source: "./data/Add-on/Civs/eC/*"; DestDir: "{app}\Empire Earth\Users\default\Civilizations"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: civs\ec and game
-Source: "./data/Add-on/Civs/eC_full/*"; DestDir: "{app}\Empire Earth\Users\default\Civilizations"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: civs\ec_full and game
-Source: "./data/Add-on/Civs/J2/*"; DestDir: "{app}\Empire Earth\Users\default\Civilizations"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: civs\j2 and game
+Source: "./data/Add-on/Civs/eC/*"; DestDir: "{app}\Empire Earth\Users\default\Civilizations"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\civs\ec and game
+Source: "./data/Add-on/Civs/eC_full/*"; DestDir: "{app}\Empire Earth\Users\default\Civilizations"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\civs\ec_full and game
+Source: "./data/Add-on/Civs/J2/*"; DestDir: "{app}\Empire Earth\Users\default\Civilizations"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\civs\j2 and game
 
 ; Discord
-Source: "./data/Add-on/Discord/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\discord and game
+Source: "./data/Add-on/DLLs/Discord/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\discord and game
+
+; Reborn.dll
+; Source: "./data/Add-on/DLLs/Reborn/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\reborn and game
 
 ; HD
 Source: "./data/Add-on/HD/terrain/*"; DestDir: "{app}\Empire Earth\Data\Textures"; \
@@ -445,16 +443,10 @@ Source: "./data/Empire Earth Base/Empire Earth - The Art of Conquest/*"; DestDir
 Source: "./data/Add-on/Movies/AoC/*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Movies"; \
   Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\movies and gameaoc;
 
-; Aoc Retail or GOG
-#if InstallType == "EE"
-  Source: "./data/Empire Earth Retail Mini - Energy/Empire Earth - The Art of Conquest/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
-    Flags: ignoreversion recursesubdirs createallsubdirs; Components: gameaoc\retail
-  Source: "./data/Empire Earth GOG Mini - Energy/Empire Earth - The Art of Conquest/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
-    Flags: ignoreversion recursesubdirs createallsubdirs; Components: gameaoc\gog
-#elif InstallType == "NeoEE"
+#if InstallType == "NeoEE"
   Source: "./data/NeoEE Base/Empire Earth - The Art of Conquest/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
     Flags: ignoreversion recursesubdirs createallsubdirs; Components: gameaoc
-  Source: "./data/NeoEE GOG Mini - Energy/Empire Earth - The Art of Conquest/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
+  ; Source: "./data/NeoEE GOG - Energy/Empire Earth - The Art of Conquest/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
     Flags: ignoreversion recursesubdirs createallsubdirs; Components: gameaoc\neo
   ; Already done in EE part Source: authtools.exe
   Source: "./data/NeoEE - CDkeys/_wonkver.pub"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
@@ -474,7 +466,7 @@ Source: "{tmp}\EE\Data\Campaigns\EELearningCampaign.ssa"; DestDir: "{app}\Empire
   Flags: ignoreversion recursesubdirs createallsubdirs external skipifsourcedoesntexist; Components: gameaoc\update;
 
 ; DreXmod
-Source: "./data/Add-on/dreXmod/2/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
+Source: "./data/Add-on/DLLs/dreXmod/2/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
   Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\drexmod and gameaoc
 ; Omega
 Source: "./data/Add-on/Omega/AoC/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
@@ -484,29 +476,32 @@ Source: "./data/Add-on/Omega_Neo/AoC/*"; DestDir: "{app}\Empire Earth - The Art 
 
 ; dgVoodoo  Bin
 Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_bin/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
-  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\dgvoodoo and game and not additional\dgvoodoo\gog 
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper and game and not additional\directx_wrapper\dx9 
 Source: "./data//Add-on/DirectX_Wrapper/GOG/DDraw.dll"; DestDir: "{app}\Empire Earth - The Art of Conquest"; DestName: "DDraw.dll"; \
-  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\dgvoodoo\gog and game;
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx9 and game;
 ; dgVoodoo Conf
-Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX11_LVL10.conf"; DestDir: "{app}\Empire Earth - The Art of Conquest"; DestName: "dgVoodoo.conf"; \
-  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\dgvoodoo\dx11_lvl10 and game;
-Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX11_LVL11.conf"; DestDir: "{app}\Empire Earth - The Art of Conquest"; DestName: "dgVoodoo.conf"; \
-  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\dgvoodoo\dx11_lvl11 and game;
+; Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX11_LVL10.conf"; DestDir: "{app}\Empire Earth - The Art of Conquest"; DestName: "dgVoodoo.conf"; \
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx11_lvl10 and game;
+; Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX11_LVL11.conf"; DestDir: "{app}\Empire Earth - The Art of Conquest"; DestName: "dgVoodoo.conf"; \
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx11_lvl11 and game;
 Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX12_LVL11.conf"; DestDir: "{app}\Empire Earth - The Art of Conquest"; DestName: "dgVoodoo.conf"; \
-  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\dgvoodoo\dx12_lvl11 and game;
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx12_lvl11 and game;
 Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX12_LVL12.conf"; DestDir: "{app}\Empire Earth - The Art of Conquest"; DestName: "dgVoodoo.conf"; \
-  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\dgvoodoo\dx12_lvl12 and game; 
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx12_lvl12 and game; 
 
 ; Civs
 Source: "./data/Add-on/Civs/eC/*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Users\default\Civilizations"; \
-  Flags: ignoreversion recursesubdirs createallsubdirs; Components: civs\ec and gameaoc
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\civs\ec and gameaoc
 Source: "./data/Add-on/Civs/eC_full/*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Users\default\Civilizations"; \
-  Flags: ignoreversion recursesubdirs createallsubdirs; Components: civs\ec_full and gameaoc
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\civs\ec_full and gameaoc
 Source: "./data/Add-on/Civs/J2/*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Users\default\Civilizations"; \
-  Flags: ignoreversion recursesubdirs createallsubdirs; Components: civs\j2 and gameaoc
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\civs\j2 and gameaoc
 
-Source: "./data/Add-on/Civs/J2/*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Users\default\Civilizations"; \
-  Flags: ignoreversion recursesubdirs createallsubdirs; Components: civs\j2 and gameaoc
+; Discord
+Source: "./data/Add-on/DLLs/Discord/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\discord and gameaoc
+
+; Reborn.dll
+; Not supported Source: "./data/Add-on/DLLs/Reborn/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\reborn and gameaoc
 
 ; HD
 Source: "./data/Add-on/HD/terrain/*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Textures"; \
@@ -624,67 +619,67 @@ Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "
 
 ; Game Settings
 Root: "HKCU"; Subkey: "{#BaseRegEE}"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D Hardware TnL"; Flags: uninsdeletekey; Components: game and not additional\dgvoodoo; Check: not IsWine
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Flags: uninsdeletekey; Components: game and additional\dgvoodoo; Check: not IsWine
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Flags: uninsdeletekey; Check: IsWine 
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth"; ValueType: Dword; ValueName: "AutoSave In Milliseconds"; ValueData: "$124F80"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth\Game Options"; ValueType: String; ValueName: "Map Type"; ValueData: "Continental"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth\Game Options"; ValueType: Dword; ValueName: "Map Size"; ValueData: "$2"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth\Game Options"; ValueType: Dword; ValueName: "Starting Resources"; ValueData: "$3"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth\Game Options"; ValueType: Dword; ValueName: "Starting Epoch"; ValueData: "$0"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth\Game Options"; ValueType: Dword; ValueName: "Ending Epoch"; ValueData: "$D"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth\Game Options"; ValueType: Dword; ValueName: "Game Unit Limit"; ValueData: "$4B0"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth\Game Options"; ValueType: Dword; ValueName: "Wonders For Victory"; ValueData: "$0"; Flags: uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth\Game Options"; ValueType: Dword; ValueName: "Game Variant"; ValueData: "$2"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth\Game Options"; ValueType: Dword; ValueName: "Difficulty Level"; ValueData: "$0"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth\Game Options"; ValueType: Dword; ValueName: "Game Speed"; ValueData: "$3"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth\Game Options"; ValueType: Dword; ValueName: "Reveal Map"; ValueData: "$0"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth\Game Options"; ValueType: Dword; ValueName: "Allow Custom Civs"; ValueData: "$1"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth\Game Options"; ValueType: Dword; ValueName: "Lock Teams"; ValueData: "$1"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth\Game Options"; ValueType: Dword; ValueName: "Lock Speed"; ValueData: "$1"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth\Game Options"; ValueType: Dword; ValueName: "Cheat Codes"; ValueData: "$0"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth"; ValueType: Dword; ValueName: "Music Volume"; ValueData: "$19"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth"; ValueType: Dword; ValueName: "Sound Volume"; ValueData: "$3C"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D Hardware TnL"; Flags: uninsdeletekey; Components: game and not additional\directx_wrapper; Check: not IsWine
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Flags: uninsdeletekey; Components: game and additional\directx_wrapper; Check: not IsWine
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Flags: uninsdeletekey; Check: IsWine 
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "AutoSave In Milliseconds"; ValueData: "$124F80"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: String; ValueName: "Map Type"; ValueData: "Continental"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Map Size"; ValueData: "$2"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Starting Resources"; ValueData: "$3"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Starting Epoch"; ValueData: "$0"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Ending Epoch"; ValueData: "$D"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Game Unit Limit"; ValueData: "$4B0"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Wonders For Victory"; ValueData: "$0"; Flags: uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Game Variant"; ValueData: "$2"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Difficulty Level"; ValueData: "$0"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Game Speed"; ValueData: "$3"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Reveal Map"; ValueData: "$0"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Allow Custom Civs"; ValueData: "$1"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Lock Teams"; ValueData: "$1"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Lock Speed"; ValueData: "$1"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Cheat Codes"; ValueData: "$0"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "Music Volume"; ValueData: "$19"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "Sound Volume"; ValueData: "$3C"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
 ; Set Default 1920x1080 32 bits
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth"; ValueType: Dword; ValueName: "Game Window Height"; ValueData: "$438"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth"; ValueType: Dword; ValueName: "Game Window Width"; ValueData: "$780"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth"; ValueType: Dword; ValueName: "Game Bit Depth"; ValueData: "$20"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth"; ValueType: Dword; ValueName: "Texture Bit Depth"; ValueData: "$20"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "Game Window Height"; ValueData: "$438"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "Game Window Width"; ValueData: "$780"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "Game Bit Depth"; ValueData: "$20"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "Texture Bit Depth"; ValueData: "$20"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
 ; Adding Installed From to allow AoC to be started without having to start EE first.
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth"; ValueType: string; ValueName: "Installed From Volume"; ValueData: "{code:GetInstallDriveLetter}"; Flags: uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Empire Earth"; ValueType: string; ValueName: "Installed From Directory"; ValueData: "{code:GetInstallWithoutDriveLetterBase}\Empire Earth\"; Flags: uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: string; ValueName: "Installed From Volume"; ValueData: "{code:GetInstallDriveLetter}"; Flags: uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: string; ValueName: "Installed From Directory"; ValueData: "{code:GetInstallWithoutDriveLetterBase}\Empire Earth\"; Flags: uninsdeletekey; Components: game
 
 ; ----------------
 
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC"; Flags: uninsdeletekey; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D Hardware TnL"; Flags: createvalueifdoesntexist; Components: gameaoc and not additional\dgvoodoo
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Flags: createvalueifdoesntexist; Components: gameaoc and additional\dgvoodoo 
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Flags: createvalueifdoesntexist; Check: IsWine
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC"; ValueType: Dword; ValueName: "AutoSave In Milliseconds"; ValueData: "$124F80"; Flags: createvalueifdoesntexist uninsdeletekey; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC\Game Options"; ValueType: String; ValueName: "Map Type"; ValueData: "Continental"; Flags: createvalueifdoesntexist; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC\Game Options"; ValueType: Dword; ValueName: "Map Size"; ValueData: "$2"; Flags: createvalueifdoesntexist; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC\Game Options"; ValueType: Dword; ValueName: "Starting Resources"; ValueData: "$3"; Flags: createvalueifdoesntexist; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC\Game Options"; ValueType: Dword; ValueName: "Starting Epoch"; ValueData: "$0"; Flags: createvalueifdoesntexist; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC\Game Options"; ValueType: Dword; ValueName: "Ending Epoch"; ValueData: "$E"; Flags: createvalueifdoesntexist; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC\Game Options"; ValueType: Dword; ValueName: "Game Unit Limit"; ValueData: "$4B0"; Flags: createvalueifdoesntexist; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC\Game Options"; ValueType: Dword; ValueName: "Wonders For Victory"; ValueData: "$0"; Flags: createvalueifdoesntexist; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC\Game Options"; ValueType: Dword; ValueName: "Game Variant"; ValueData: "$2"; Flags: createvalueifdoesntexist; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC\Game Options"; ValueType: Dword; ValueName: "Difficulty Level"; ValueData: "$0"; Flags: createvalueifdoesntexist; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC\Game Options"; ValueType: Dword; ValueName: "Game Speed"; ValueData: "$3"; Flags: createvalueifdoesntexist; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC\Game Options"; ValueType: Dword; ValueName: "Reveal Map"; ValueData: "$0"; Flags: createvalueifdoesntexist; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC\Game Options"; ValueType: Dword; ValueName: "Allow Custom Civs"; ValueData: "$1"; Flags: createvalueifdoesntexist; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC\Game Options"; ValueType: Dword; ValueName: "Lock Teams"; ValueData: "$1"; Flags: createvalueifdoesntexist; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC\Game Options"; ValueType: Dword; ValueName: "Lock Speed"; ValueData: "$1"; Flags: createvalueifdoesntexist; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC\Game Options"; ValueType: Dword; ValueName: "Cheat Codes"; ValueData: "$0"; Flags: createvalueifdoesntexist; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC"; ValueType: Dword; ValueName: "Music Volume"; ValueData: "$19"; Flags: createvalueifdoesntexist; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC"; ValueType: Dword; ValueName: "Sound Volume"; ValueData: "$3C"; Flags: createvalueifdoesntexist; Components: gameaoc 
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; Flags: uninsdeletekey; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D Hardware TnL"; Flags: createvalueifdoesntexist; Components: gameaoc and not additional\directx_wrapper
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Flags: createvalueifdoesntexist; Components: gameaoc and additional\directx_wrapper 
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Flags: createvalueifdoesntexist; Check: IsWine
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "AutoSave In Milliseconds"; ValueData: "$124F80"; Flags: createvalueifdoesntexist uninsdeletekey; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}\Game Options"; ValueType: String; ValueName: "Map Type"; ValueData: "Continental"; Flags: createvalueifdoesntexist; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}\Game Options"; ValueType: Dword; ValueName: "Map Size"; ValueData: "$2"; Flags: createvalueifdoesntexist; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}\Game Options"; ValueType: Dword; ValueName: "Starting Resources"; ValueData: "$3"; Flags: createvalueifdoesntexist; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}\Game Options"; ValueType: Dword; ValueName: "Starting Epoch"; ValueData: "$0"; Flags: createvalueifdoesntexist; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}\Game Options"; ValueType: Dword; ValueName: "Ending Epoch"; ValueData: "$E"; Flags: createvalueifdoesntexist; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}\Game Options"; ValueType: Dword; ValueName: "Game Unit Limit"; ValueData: "$4B0"; Flags: createvalueifdoesntexist; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}\Game Options"; ValueType: Dword; ValueName: "Wonders For Victory"; ValueData: "$0"; Flags: createvalueifdoesntexist; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}\Game Options"; ValueType: Dword; ValueName: "Game Variant"; ValueData: "$2"; Flags: createvalueifdoesntexist; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}\Game Options"; ValueType: Dword; ValueName: "Difficulty Level"; ValueData: "$0"; Flags: createvalueifdoesntexist; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}\Game Options"; ValueType: Dword; ValueName: "Game Speed"; ValueData: "$3"; Flags: createvalueifdoesntexist; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}\Game Options"; ValueType: Dword; ValueName: "Reveal Map"; ValueData: "$0"; Flags: createvalueifdoesntexist; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}\Game Options"; ValueType: Dword; ValueName: "Allow Custom Civs"; ValueData: "$1"; Flags: createvalueifdoesntexist; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}\Game Options"; ValueType: Dword; ValueName: "Lock Teams"; ValueData: "$1"; Flags: createvalueifdoesntexist; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}\Game Options"; ValueType: Dword; ValueName: "Lock Speed"; ValueData: "$1"; Flags: createvalueifdoesntexist; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}\Game Options"; ValueType: Dword; ValueName: "Cheat Codes"; ValueData: "$0"; Flags: createvalueifdoesntexist; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "Music Volume"; ValueData: "$19"; Flags: createvalueifdoesntexist; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "Sound Volume"; ValueData: "$3C"; Flags: createvalueifdoesntexist; Components: gameaoc 
 ; Set Default 1920x1080 32 bits (Note : if Texture Bit Depth != Game Bit Depth, the main menu is just white and unreadable)
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC"; ValueType: Dword; ValueName: "Game Window Height"; ValueData: "$438"; Flags: createvalueifdoesntexist uninsdeletekey; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC"; ValueType: Dword; ValueName: "Game Window Width"; ValueData: "$780"; Flags: createvalueifdoesntexist uninsdeletekey; Components: gameaoc 
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC"; ValueType: Dword; ValueName: "Game Bit Depth"; ValueData: "$20"; Flags: createvalueifdoesntexist uninsdeletekey; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC"; ValueType: Dword; ValueName: "Texture Bit Depth"; ValueData: "$20"; Flags: createvalueifdoesntexist uninsdeletekey; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC"; ValueType: string; ValueName: "Installed From Volume"; ValueData: "{code:GetInstallDriveLetter}"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC"; ValueType: string; ValueName: "Installed From Directory"; ValueData: "{code:GetInstallWithoutDriveLetterBase}\Empire Earth - The Art of Conquest\"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "Game Window Height"; ValueData: "$438"; Flags: createvalueifdoesntexist uninsdeletekey; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "Game Window Width"; ValueData: "$780"; Flags: createvalueifdoesntexist uninsdeletekey; Components: gameaoc 
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "Game Bit Depth"; ValueData: "$20"; Flags: createvalueifdoesntexist uninsdeletekey; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "Texture Bit Depth"; ValueData: "$20"; Flags: createvalueifdoesntexist uninsdeletekey; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: string; ValueName: "Installed From Volume"; ValueData: "{code:GetInstallDriveLetter}"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: string; ValueName: "Installed From Directory"; ValueData: "{code:GetInstallWithoutDriveLetterBase}\Empire Earth - The Art of Conquest\"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
 
 [Icons]
 #if InstallMode != "Portable"
@@ -699,7 +694,7 @@ Root: "HKCU"; Subkey: "{#BaseRegAoC}\EE-AOC"; ValueType: string; ValueName: "Ins
 #endif
 
 [InstallDelete]
-; Supported Component modification : GOG or Retail | dgVoodoo | dreXmod | Discord | Movies
+; Supported Component modification : old GOG or Retail | dgVoodoo | dreXmod | Discord | Movies | Reborn
 ; Other component are too hard to delete without maybe deleting user files (modding)
 Type: files; Name: "{app}\Empire Earth\Empire Earth.exe"
 Type: files; Name: "{app}\Empire Earth\D3D8.dll"
@@ -708,9 +703,10 @@ Type: files; Name: "{app}\Empire Earth\D3DImm.dll"
 Type: files; Name: "{app}\Empire Earth\DDraw.dll"
 Type: files; Name: "{app}\Empire Earth\dgVoodooCpl.exe"
 Type: files; Name: "{app}\Empire Earth\dgVoodoo.conf"
-Type: files; Name: "{app}\Empire Earth\gog.ico"
 Type: files; Name: "{app}\Empire Earth\dreXmod.config"
 Type: files; Name: "{app}\Empire Earth\dreXmod.dll"
+Type: files; Name: "{app}\Empire Earth\Reborn.ini"
+Type: files; Name: "{app}\Empire Earth\Reborn.dll"
 Type: files; Name: "{app}\Empire Earth\Data\WONLobby Resources\GameOptionsCtrl.cfg"
 Type: files; Name: "{app}\Empire Earth\discord_game_sdk.dll"
 Type: files; Name: "{app}\Empire Earth\EEDiscordRichPresence.dll"
@@ -724,9 +720,10 @@ Type: files; Name: "{app}\Empire Earth - The Art of Conquest\D3DImm.dll"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\DDraw.dll"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\dgVoodooCpl.exe"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\dgVoodoo.conf"
-Type: files; Name: "{app}\Empire Earth - The Art of Conquest\gog.ico"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\dreXmod.config"
-Type: files; Name: "{app}\Empire Earth - The Art of Conquest\dreXmod.dll"
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\dreXmod.dll" 
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Reborn.ini" 
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Reborn.dll"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Data\WONLobby Resources\GameOptionsCtrl.cfg"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\discord_game_sdk.dll"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\EEDiscordRichPresence.dll"   
@@ -735,20 +732,26 @@ Type: filesandordirs; Name: "{app}\Empire Earth - The Art of Conquest\Data\_Movi
 
 [UninstallDelete]
 ; A little extra cleaning to the installed files
-; Convention : Never delete the entire folder !     
+; Convention : Never delete the entire program folder !     
 Type: files; Name: "{app}\Empire Earth\0_Error.log"
 Type: files; Name: "{app}\Empire Earth\neoee.log"
 Type: files; Name: "{app}\Empire Earth\upnp_info.txt"
+Type: files; Name: "{app}\Empire Earth\Reborn.ini"
 Type: files; Name: "{app}\Empire Earth\_won*"
 Type: files; Name: "{app}\Empire Earth\_wonHTTPCache\*"
 Type: filesandordirs; Name: "{app}\Empire Earth\_wonHTTPCache"
+; portuguese_brazil create that dir for some reasons (not used)
+Type: filesandordirs; Name: "{app}\Empire Earth\Users\default\Civilizações"
 ; ----------------
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\0_Error.log" 
-Type: files; Name: "{app}\Empire Earth - The Art of Conquest\neoee.log"
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\neoee.log" 
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\upnp_info.txt"
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Reborn.ini"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\_won*"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\_wonHTTPCache\*"
-Type: filesandordirs; Name: "{app}\Empire Earth - The Art of Conquest\_wonHTTPCache"
+Type: filesandordirs; Name: "{app}\Empire Earth - The Art of Conquest\_wonHTTPCache" 
+; portuguese_brazil create that dir for some reasons (not used)
+Type: filesandordirs; Name: "{app}\Empire Earth - The Art of Conquest\Users\default\Civilizações"
 
 
 ; Translation Note
@@ -984,6 +987,10 @@ Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram program=""
   Flags: runhidden; StatusMsg: "Opening {#MyAppName} in Firewall"; MinVersion: 0,5.0; OnlyBelowVersion: 0,6.0; Tasks: firewallexception; Components: game; Check: IsAdminInstallMode
 Filename: "{sys}\netsh.exe"; Parameters: "firewall add allowedprogram program=""{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"" name=""{#MyAppName} - AoC"" mode=ENABLE"; \
   Flags: runhidden; StatusMsg: "Opening {#MyAppName} : AoC in Firewall"; MinVersion: 0,5.0; OnlyBelowVersion: 0,6.0; Tasks: firewallexception; Components: gameaoc; Check: IsAdminInstallMode
+
+; DX9 Setup
+Filename: "{tmp}\DirectX_9\DXSETUP.exe"; Parameters: "/silent"; Flags: runhidden; \
+    StatusMsg: "Installing DirectX 9..."; MinVersion: 0,5.0; Components: additional\directx_wrapper\dx9; Check: IsAdminInstallMode
 
 #if InstallType == "NeoEE"
   // NeoEE CDKeys Regedit Hell
@@ -1339,7 +1346,10 @@ begin
     #endif
     then
     begin
-      MsgBox(ExpandConstant('{cm:AlreadyInstalled}'), mbInformation, MB_OK);
+      if MsgBox(ExpandConstant('{cm:AlreadyInstalled}'), mbInformation, MB_YESNO) = IDNO then
+      begin
+        Exit;
+      end;
     end
   else if (WizardSupressMsgBoxes = False) then
   begin
@@ -1424,11 +1434,9 @@ begin
     #if InstallType != "NeoEE"
       idpAddFileComp(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/_GameResource.cfg'), ExpandConstant('{tmp}\EE\Data\WONLobby Resources\_GameResource.cfg'), 'game\update');
       idpAddFileComp(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/_LobbyResource.cfg'), ExpandConstant('{tmp}\EE\Data\WONLobby Resources\_LobbyResource.cfg'), 'game\update');
-      idpAddFileComp(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/GameOptionsCtrl.cfg'), ExpandConstant('{tmp}\EE\Data\WONLobby Resources\GameOptionsCtrl.cfg'), 'game\update');
     #else
       idpAddFileComp(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/_GameResource_Neo.cfg'), ExpandConstant('{tmp}\EE\Data\WONLobby Resources\_GameResource.cfg'), 'game\update');
       idpAddFileComp(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/_LobbyResource_Neo.cfg'), ExpandConstant('{tmp}\EE\Data\WONLobby Resources\_LobbyResource.cfg'), 'game\update');
-      idpAddFileComp(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/GameOptionsCtrl_Neo.cfg'), ExpandConstant('{tmp}\EE\Data\WONLobby Resources\GameOptionsCtrl.cfg'), 'game\update');                                                                                                                                                                                                                  
     #endif
 
     // Zocker Server HTTPS
@@ -1447,11 +1455,9 @@ begin
     #if InstallType != "NeoEE"
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/_GameResource.cfg'), ExpandConstant('https://{#UpdateUrlMirror}/localized/{language}/EE/Data/WONLobby Resources/_GameResource.cfg')); 
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/_LobbyResource.cfg'), ExpandConstant('https://{#UpdateUrlMirror}/localized/{language}/EE/Data/WONLobby Resources/_LobbyResource.cfg'));
-      idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/GameOptionsCtrl.cfg'), ExpandConstant('https://{#UpdateUrlMirror}/localized/{language}/EE/Data/WONLobby Resources/GameOptionsCtrl.cfg'));
     #else
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/_GameResource_Neo.cfg'), ExpandConstant('https://{#UpdateUrlMirror}/localized/{language}/EE/Data/WONLobby Resources/_GameResource_Neo.cfg')); 
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/_LobbyResource_Neo.cfg'), ExpandConstant('https://{#UpdateUrlMirror}/localized/{language}/EE/Data/WONLobby Resources/_LobbyResource_Neo.cfg'));
-      idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/GameOptionsCtrl_Neo.cfg'), ExpandConstant('https://{#UpdateUrlMirror}/localized/{language}/EE/Data/WONLobby Resources/GameOptionsCtrl_Neo.cfg'));                                                                                                                                                                                                               
     #endif
     
     // EE Community Server HTTP
@@ -1470,11 +1476,9 @@ begin
     #if InstallType != "NeoEE" 
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/_GameResource.cfg'), ExpandConstant('http://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/_GameResource.cfg'));
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/_LobbyResource.cfg'), ExpandConstant('http://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/_LobbyResource.cfg')); 
-      idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/GameOptionsCtrl.cfg'), ExpandConstant('http://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/GameOptionsCtrl.cfg')); 
     #else
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/_GameResource_Neo.cfg'), ExpandConstant('http://{#UpdateUrlMirror}/localized/{language}/EE/Data/WONLobby Resources/_GameResource_Neo.cfg')); 
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/_LobbyResource_Neo.cfg'), ExpandConstant('http://{#UpdateUrlMirror}/localized/{language}/EE/Data/WONLobby Resources/_LobbyResource_Neo.cfg'));
-      idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/GameOptionsCtrl_Neo.cfg'), ExpandConstant('http://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/GameOptionsCtrl_Neo.cfg'));                                                                                                                                                                                                              
     #endif
     
     // Zocker Server HTTP
@@ -1493,11 +1497,9 @@ begin
     #if InstallType != "NeoEE"  
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/_GameResource.cfg'), ExpandConstant('http://{#UpdateUrlMirror}/localized/{language}/EE/Data/WONLobby Resources/_GameResource.cfg'));
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/_LobbyResource.cfg'), ExpandConstant('http://{#UpdateUrlMirror}/localized/{language}/EE/Data/WONLobby Resources/_LobbyResource.cfg'));
-      idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/GameOptionsCtrl.cfg'), ExpandConstant('http://{#UpdateUrlMirror}/localized/{language}/EE/Data/WONLobby Resources/GameOptionsCtrl.cfg')); 
     #else
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/_GameResource_Neo.cfg'), ExpandConstant('http://{#UpdateUrlMirror}/localized/{language}/EE/Data/WONLobby Resources/_GameResource_Neo.cfg'));
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/_LobbyResource_Neo.cfg'), ExpandConstant('http://{#UpdateUrlMirror}/localized/{language}/EE/Data/WONLobby Resources/_LobbyResource_Neo.cfg'));;
-      idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/WONLobby Resources/GameOptionsCtrl_Neo.cfg'), ExpandConstant('http://{#UpdateUrlMirror}/localized/{language}/EE/Data/WONLobby Resources/GameOptionsCtrl_Neo.cfg'));                                                                                                                                                                                                              
     #endif
        
     // -------- AoC --------
@@ -1512,11 +1514,9 @@ begin
     #if InstallType != "NeoEE"  
       idpAddFileComp(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/_GameResource.cfg'), ExpandConstant('{tmp}\AoC\Data\WONLobby Resources\_GameResource.cfg'), 'gameaoc\update');
       idpAddFileComp(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/_LobbyResource.cfg'), ExpandConstant('{tmp}\AoC\Data\WONLobby Resources\_LobbyResource.cfg'), 'gameaoc\update');   
-      idpAddFileComp(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/GameOptionsCtrl.cfg'), ExpandConstant('{tmp}\AoC\Data\WONLobby Resources\GameOptionsCtrl.cfg'), 'gameaoc\update');     
     #else
       idpAddFileComp(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/_GameResource_Neo.cfg'), ExpandConstant('{tmp}\AoC\Data\WONLobby Resources\_GameResource.cfg'), 'gameaoc\update');
       idpAddFileComp(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/_LobbyResource_Neo.cfg'), ExpandConstant('{tmp}\AoC\Data\WONLobby Resources\_LobbyResource.cfg'), 'gameaoc\update');
-      idpAddFileComp(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/GameOptionsCtrl_Neo.cfg'), ExpandConstant('{tmp}\AoC\Data\WONLobby Resources\GameOptionsCtrl.cfg'), 'gameaoc\update');                                                                                                                                                                                       
     #endif
     
     // Zocker Server HTTPS
@@ -1529,11 +1529,9 @@ begin
     #if InstallType != "NeoEE"
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/_GameResource.cfg'), ExpandConstant('https://{#UpdateUrlMirror}/localized/{language}/AoC/Data/WONLobby Resources/_GameResource.cfg'));
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/_LobbyResource.cfg'), ExpandConstant('https://{#UpdateUrlMirror}/localized/{language}/AoC/Data/WONLobby Resources/_LobbyResource.cfg'));
-      idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/GameOptionsCtrl.cfg'), ExpandConstant('https://{#UpdateUrlMirror}/localized/{language}/AoC/Data/WONLobby Resources/GameOptionsCtrl.cfg'));
     #else 
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/_GameResource_Neo.cfg'), ExpandConstant('https://{#UpdateUrlMirror}/localized/{language}/AoC/Data/WONLobby Resources/_GameResource_Neo.cfg'));
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/_LobbyResource_Neo.cfg'), ExpandConstant('https://{#UpdateUrlMirror}/localized/{language}/AoC/Data/WONLobby Resources/_LobbyResource_Neo.cfg'));
-      idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/GameOptionsCtrl_Neo.cfg'), ExpandConstant('https://{#UpdateUrlMirror}/localized/{language}/AoC/Data/WONLobby Resources/GameOptionsCtrl_Neo.cfg'));
     #endif
    
     // EE Community Server HTTP
@@ -1546,11 +1544,9 @@ begin
     #if InstallType != "NeoEE"
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/_GameResource.cfg'), ExpandConstant('http://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/_GameResource.cfg'));
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/_LobbyResource.cfg'), ExpandConstant('http://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/_LobbyResource.cfg'));;
-      idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/GameOptionsCtrl.cfg'), ExpandConstant('http://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/GameOptionsCtrl.cfg'));;
     #else 
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/_GameResource_Neo.cfg'), ExpandConstant('http://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/_GameResource_Neo.cfg'));
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/_LobbyResource_Neo.cfg'), ExpandConstant('http://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/_LobbyResource_Neo.cfg'));;
-      idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/GameOptionsCtrl_Neo.cfg'), ExpandConstant('http://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/GameOptionsCtrl_Neo.cfg'));;
     #endif
       
     // Zocker Server HTTP
@@ -1563,11 +1559,9 @@ begin
     #if InstallType != "NeoEE"
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/_GameResource.cfg'), ExpandConstant('http://{#UpdateUrlMirror}/localized/{language}/AoC/Data/WONLobby Resources/_GameResource.cfg'));
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/_LobbyResource.cfg'), ExpandConstant('http://{#UpdateUrlMirror}/localized/{language}/AoC/Data/WONLobby Resources/_LobbyResource.cfg'));
-      idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/GameOptionsCtrl.cfg'), ExpandConstant('http://{#UpdateUrlMirror}/localized/{language}/AoC/Data/WONLobby Resources/GameOptionsCtrl.cfg'));
     #else  
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/_GameResource_Neo.cfg'), ExpandConstant('http://{#UpdateUrlMirror}/localized/{language}/AoC/Data/WONLobby Resources/_GameResource_Neo.cfg'));
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/_LobbyResource_Neo.cfg'), ExpandConstant('http://{#UpdateUrlMirror}/localized/{language}/AoC/Data/WONLobby Resources/_LobbyResource_Neo.cfg'));
-      idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/GameOptionsCtrl_Neo.cfg'), ExpandConstant('http://{#UpdateUrlMirror}/localized/{language}/AoC/Data/WONLobby Resources/GameOptionsCtrl_Neo.cfg'));
     #endif
   end;
   
@@ -1636,9 +1630,8 @@ begin
   // Create tmp dir to download files
   CreateDir(ExpandConstant('{tmp}\EE'));
   CreateDir(ExpandConstant('{tmp}\EE\Data'));
-  CreateDir(ExpandConstant('{tmp}\EE\Data\Campaigns'));
-  if IsComponentSelected('additional\movies') and IsComponentSelected('game\update') then  
-    CreateDir(ExpandConstant('{tmp}\EE\Data\Movies'));   
+  CreateDir(ExpandConstant('{tmp}\EE\Data\Campaigns'));  
+  CreateDir(ExpandConstant('{tmp}\EE\Data\Movies'));   
   CreateDir(ExpandConstant('{tmp}\EE\Data\WONLobby Resources'))
   CreateDir(ExpandConstant('{tmp}\AoC'));        
   CreateDir(ExpandConstant('{tmp}\AoC\Data'));
