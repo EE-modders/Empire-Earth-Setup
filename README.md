@@ -7,12 +7,14 @@
 ## Features
 🎮 Empire Earth & The Art of Conquest\
 🌐 NeoEE (with CD Keys generation)\
+📣 Discord Status\
 🗺️ Support 11 languages\
 📥 Download localized content online (support mirror)\
 ✅ Online update checker (support mirror)\
 🖥️ DirectX Wrapper (DX9 with GOG dll and DX12 with dgVoodoo dll)\
 🪛 Better compatibility with additonal flags\
 ➕ More maps and HD Textures (preview)\
+➕ dreXmod 2\
 🔥 Registered in Firewall (Admin)\
 📥 DirectX 9 Install (when using DirectX Wrapper for DirectX 9)\
 🔐 Digitally signed
