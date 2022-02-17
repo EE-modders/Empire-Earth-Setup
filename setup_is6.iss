@@ -68,11 +68,16 @@
 ;         | Since after analysis the binaries of GOG and the one of the 2002 Empire Earth crack are identical
 ;         | the installation mode of the GOG binary has been removed since it is useless (its equivalent is to
 ;         | simply use the DirectX Wrapper of DirectX 9)
+; ---------------------------------------
+; 1.0.0.1 | NeoEE version fix
+;         |------------------------------
+;         | Fixed invalid regedit path for NeoEE (Installed From Directory was reversed)
+;         | Deleted old NeoEE integrated updater
 ; ---------------------------------------  
 
 ; SETUP SETTINGS
 
-#define MySetupVersion "1.0.0.0"
+#define MySetupVersion "1.0.0.1"
 #define MyAppExeName "Empire Earth.exe"
 #define MyAppGroupName "Empire Earth" 
 
@@ -111,8 +116,8 @@
   #define BaseRegEE = "Software\SSSI\Empire Earth"
   #define BaseRegAoC = "Software\Mad Doc Software\EE-AOC"
 #elif InstallType == "NeoEE"
-  #define BaseRegEE = "Software\Neo\Art of Conquest"
-  #define BaseRegAoC = "Software\Neo\Empire Earth"
+  #define BaseRegEE = "Software\Neo\Empire Earth"
+  #define BaseRegAoC = "Software\Neo\Art of Conquest"
 #else
   #error Unsupported Install Type
 #endif
@@ -678,8 +683,8 @@ Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "Game Window
 Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "Game Window Width"; ValueData: "$780"; Flags: createvalueifdoesntexist uninsdeletekey; Components: gameaoc 
 Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "Game Bit Depth"; ValueData: "$20"; Flags: createvalueifdoesntexist uninsdeletekey; Components: gameaoc
 Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "Texture Bit Depth"; ValueData: "$20"; Flags: createvalueifdoesntexist uninsdeletekey; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: string; ValueName: "Installed From Volume"; ValueData: "{code:GetInstallDriveLetter}"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: string; ValueName: "Installed From Directory"; ValueData: "{code:GetInstallWithoutDriveLetterBase}\Empire Earth - The Art of Conquest\"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: string; ValueName: "Installed From Volume"; ValueData: "{code:GetInstallDriveLetter}"; Flags: uninsdeletekey; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: string; ValueName: "Installed From Directory"; ValueData: "{code:GetInstallWithoutDriveLetterBase}\Empire Earth - The Art of Conquest\"; Flags: uninsdeletekey; Components: gameaoc
 
 [Icons]
 #if InstallMode != "Portable"
