@@ -73,11 +73,20 @@
 ;         |------------------------------
 ;         | Fixed invalid regedit path for NeoEE (Installed From Directory was reversed)
 ;         | Deleted old NeoEE integrated updater
+; ---------------------------------------
+; 1.0.1.0 | NeoEE CDKeys user support, fixed Regedit and added new tool
+;         |------------------------------
+;         | Patched authtools.exe to install CDKeys in HKCU (now there is 2 authtools bin)
+;         | Patched EE & AoC to read CDKeys in HKCU (now there is 2 Neo EE/AoC bin)   
+;         | Fixed wrong regedit compatibility delete that was deleting the entire (Layers) key  
+;         | Reworked compatibility flags, with fewer flags and better admin rights                  
+;         | Added Empire Earth Diagnostic, a simple tool giving install informations (.NET 4) 
+;         | Allow to install the certificate as user
 ; ---------------------------------------  
 
 ; SETUP SETTINGS
 
-#define MySetupVersion "1.0.0.1"
+#define MySetupVersion "1.0.1.0"
 #define MyAppExeName "Empire Earth.exe"
 #define MyAppGroupName "Empire Earth" 
 
@@ -122,10 +131,6 @@
   #error Unsupported Install Type
 #endif
 #define BaseRegCompatibility = "Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"
-
-; Compatibility
-; Default is installed even when user don't select compatibility flags in taks (so be careful here !)
-#define CompatibilityDefaultFlags = "HeapClearAllocation ForceInvalidateOnClose FontMigration HIGHDPIAWARE"
 
 ; Audio
 #define AudioModule true
@@ -291,24 +296,23 @@ Name: "chinese"; MessagesFile: "unofficial_isl\IS6\ChineseSimplified.isl"
 Name: "chinese_traditional"; MessagesFile: "unofficial_isl\IS6\ChineseTraditional.isl" 
 Name: "korean"; MessagesFile: "unofficial_isl\IS6\Korean.isl"
 
-[Tasks] 
-Name: "compatibilityflags"; Description: "Add compatibility flags"; MinVersion: 0.0,5.1;
+[Tasks]   
+Name: "compatibility"; Description: "Enable compatibility flags"; MinVersion: 0.0,5.1;
+Name: "compatibility_windows"; Description: "Enable earlier Windows compatibility mode"; MinVersion: 0.0,5.1;
 Name: "firewallexception"; Description: "Add Empire Earth in the FireWall"; MinVersion: 0.0,5.0; Check: IsAdminInstallMode
 ; GOG Setup install DirectPlay but i don't think it's really important... some kind of default install for old DX game maybe
 ; Name: "directplay"; Description: "Install DirectPlay to improve compatibility"; MinVersion: 6.2; Check: IsAdminInstallMode
 #if InstallType == "NeoEE"
-  ; NeoEE patch read the CDKey in LM making non-admin unnable to register and play...
-  ; Also we are currently using the official cdkey register exec that only work as admin
-  ; Find a way to redirect LM to CU and rewrite the cdkey register exec could be a good idea
-  ; Useful note : Currently cdkey can't be generated from a VM (technically...) and Linux (Wine) always generate the same
-  ; Anyway, if anyone needs a NeoEE CD key, just ask Zocker or EnergyCube by private message.
-  Name: "neoee_cdkeys"; Description: "Register NeoEE CDKeys (Required to play online)"; MinVersion: 0.0,5.0; Check: IsAdminInstallMode
+  ; Since 1.0.1.0 NeoEE CDKeys support HKLM & HKCU
+  Name: "neoee_cdkeys"; Description: "Register NeoEE CDKeys (Required to use the online lobby)"; MinVersion: 0.0,5.0;
 #endif 
-Name: "everyoneadminstart"; Description: "Require administrator rights for all users to run the game"; MinVersion: 0.0,5.1; Flags: unchecked; Check: IsAdminInstallMode
 
 #if CertInclude
-  Name: "certinclude"; Description: "Install Empire Earth Community Certificate (Uncheck if you don't trust us!)"; MinVersion: 0.0,6.0
+  Name: "certinclude"; Description: "Install Empire Earth Community Certificate (Uncheck if you don't trust us!)"; MinVersion: 0.0,6.0; Check: IsAdminInstallMode
+  Name: "certinclude"; Description: "Install Empire Earth Community Certificate (Check only if you trust us!)"; MinVersion: 0.0,6.0; Flags: unchecked; Check: not IsAdminInstallMode
 #endif
+
+Name: "everyoneadminstart"; Description: "Require administrator rights for all users to run the game"; MinVersion: 0.0,5.1; Flags: unchecked; Check: IsAdminInstallMode
 
 #if InstallMode != "Portable"
   Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
@@ -352,7 +356,9 @@ Name: "additional\directx_wrapper\dx9"; Description: "DirectX 9 (Windows XP&+) [
 Name: "additional\directx_wrapper\dx12_lvl11"; Description: "DirectX 12 API lvl.11 v2.71.3 (Windows 10&+)"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,10;
 Name: "additional\directx_wrapper\dx12_lvl12"; Description: "DirectX 12 API lvl.12 v2.71.3 (Windows 10&+)"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,10;
 
-Name: "additional\discord"; Description: "Discord Presence"; Flags: disablenouninstallwarning; Types: full compact; MinVersion: 0.0,6.1
+Name: "additional\discord"; Description: "Discord Presence"; Flags: disablenouninstallwarning; Types: full compact; MinVersion: 0.0,6.1 
+Name: "additional\tools"; Description: "Tools";
+Name: "additional\tools\diagnostic"; Description: "Empire Earth Diagnostic"; Flags: disablenouninstallwarning; Types: full compact; MinVersion: 0.0,6.1
 Name: "additional\civs"; Description: "Civilizations"
 Name: "additional\civs\ec"; Description: "eC Standard Civilizations (25)"; Types: full compact
 Name: "additional\civs\ec_full"; Description: "eC Full Civilizations (71)"
@@ -390,8 +396,11 @@ Source: "./data/Add-on/Movies/EE/*"; DestDir: "{app}\Empire Earth\Data\Movies"; 
 
 #if InstallType == "NeoEE"
   Source: "./data/NeoEE Base/Empire Earth/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game
-  Source: "./data/NeoEE - CDkeys/authtools.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall ignoreversion recursesubdirs createallsubdirs; Components: game
-  Source: "./data/NeoEE - CDkeys/_wonkver.pub"; DestDir: "{app}\Empire Earth"; Flags: deleteafterinstall ignoreversion recursesubdirs createallsubdirs; Components: game
+  Source: "./data/NeoEE - Admin/Empire Earth/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game; Check: IsAdminInstallMode
+  Source: "./data/NeoEE - User/Empire Earth/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game; Check: not IsAdminInstallMode
+  Source: "./data/NeoEE - CDKeys/authtools_user.exe"; DestDir: "{tmp}";  DestName: "authtools.exe"; Flags: deleteafterinstall ignoreversion recursesubdirs createallsubdirs; Components: game; Check: not IsAdminInstallMode
+  Source: "./data/NeoEE - CDKeys/authtools_admin.exe"; DestDir: "{tmp}";  DestName: "authtools.exe"; Flags: deleteafterinstall ignoreversion recursesubdirs createallsubdirs; Components: game; Check: IsAdminInstallMode
+  Source: "./data/NeoEE - CDKeys/_wonkver.pub"; DestDir: "{app}\Empire Earth"; Flags: deleteafterinstall ignoreversion recursesubdirs createallsubdirs; Components: game
   ; NeoEE - Wine Fix (GDI)
   Source: "./data/NeoEE - Wine/NeoEE.cfg"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game; Check: IsWine
 #endif
@@ -404,8 +413,8 @@ Source: "{tmp}\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recurs
 ; DreXmod
 ; Soon deprecated by drex 3 that will most probably not included in the setup because it could split community
 ; Also Reborn Dll will soon replace the main functions of drex 2
-; Yukon s'il te plait, partage ton code et faisons avancer le communauté ensemble, sérieusement ça n'a aucun sens nous somme si peu de dev...
-Source: "./data/Add-on/DLLs/dreXmod/2/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\drexmod and game; 
+; Yukon s'il te plait, rends ton code public et faisons avancer le communauté tous ensemble, sérieusement ça n'a aucun sens nous somme si peu de dev...
+Source: "./data/Add-on/DLLs/dreXmod/2/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\drexmod and game;  
 ; Omega
 Source: "./data/Add-on/Omega/EE/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: (additional\omega\no_db or additional\omega\neo) and game
 ; Maybe te delete later, but it add some fun
@@ -451,10 +460,12 @@ Source: "./data/Add-on/Movies/AoC/*"; DestDir: "{app}\Empire Earth - The Art of 
 #if InstallType == "NeoEE"
   Source: "./data/NeoEE Base/Empire Earth - The Art of Conquest/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
     Flags: ignoreversion recursesubdirs createallsubdirs; Components: gameaoc
-  ; Source: "./data/NeoEE GOG - Energy/Empire Earth - The Art of Conquest/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
-    Flags: ignoreversion recursesubdirs createallsubdirs; Components: gameaoc\neo
+  Source: "./data/NeoEE - Admin/Empire Earth - The Art of Conquest/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
+    Flags: ignoreversion recursesubdirs createallsubdirs; Components: gameaoc; Check: IsAdminInstallMode
+  Source: "./data/NeoEE - User/Empire Earth - The Art of Conquest/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
+    Flags: ignoreversion recursesubdirs createallsubdirs; Components: gameaoc; Check: not IsAdminInstallMode
   ; Already done in EE part Source: authtools.exe
-  Source: "./data/NeoEE - CDkeys/_wonkver.pub"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
+  Source: "./data/NeoEE - CDKeys/_wonkver.pub"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
     Flags: deleteafterinstall ignoreversion recursesubdirs createallsubdirs; Components: gameaoc
   ; NeoEE - Wine Fix (GDI)
   Source: "./data/NeoEE - Wine/NeoEE.cfg"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
@@ -516,151 +527,163 @@ Source: "./data/Add-on/HD/buildings/*"; DestDir: "{app}\Empire Earth - The Art o
 Source: "./data/Add-on/HD/effects/*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Textures"; \
   Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\effects and gameaoc
 
+; -------------------
+;  Allow config edit
+; -------------------  
+Source: "{app}\Empire Earth\*.cfg"; DestDir: "{app}\Empire Earth"; Permissions: authusers-modify; Flags: ignoreversion recursesubdirs createallsubdirs external; Components: game;
+Source: "{app}\Empire Earth\*.config"; DestDir: "{app}\Empire Earth"; Permissions: authusers-modify; Flags: ignoreversion recursesubdirs createallsubdirs external; Components: game;
+Source: "{app}\Empire Earth\*.ini"; DestDir: "{app}\Empire Earth"; Permissions: authusers-modify; Flags: ignoreversion recursesubdirs createallsubdirs external; Components: game;
+; ----------------
+Source: "{app}\Empire Earth - The Art of Conquest\*.cfg"; DestDir: "{app}\Empire Earth - The Art of Conquest"; Permissions: authusers-modify; Flags: ignoreversion recursesubdirs createallsubdirs external; Components: gameaoc;
+Source: "{app}\Empire Earth - The Art of Conquest\*.config"; DestDir: "{app}\Empire Earth - The Art of Conquest"; Permissions: authusers-modify; Flags: ignoreversion recursesubdirs createallsubdirs external; Components: gameaoc;
+Source: "{app}\Empire Earth - The Art of Conquest\*.ini"; DestDir: "{app}\Empire Earth - The Art of Conquest"; Permissions: authusers-modify; Flags: ignoreversion recursesubdirs createallsubdirs external; Components: gameaoc;
+
+; ---------------------
+;         Tools
+; ---------------------
+Source: "./data/Add-on/Tools/Diagnostic/*"; DestDir: "{app}\Tools\Diagnostic"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\tools\diagnostic;
+
+[Dirs]
+; ---------------------
+;  Allow Data/Civ edit
+; ---------------------
+Name: "{app}\Empire Earth\Data"; Permissions: authusers-modify; Components: game;
+Name: "{app}\Empire Earth\Users"; Permissions: authusers-modify; Components: game;
+; ---------------- 
+Name: "{app}\Empire Earth - The Art of Conquest\Data"; Permissions: authusers-modify; Components: gameaoc
+Name: "{app}\Empire Earth - The Art of Conquest\Users"; Permissions: authusers-modify; Components: gameaoc
+
 [Registry]
 ; Compatibility
-;   WIN7RTM    DWM8And16BitMitigation    for Windows 10+
-;   WINXPSP3   DWM8And16BitMitigation    for Windows 7+ & Windows 10-
-;   WIN98               -                for Windows >XP
+;   WIN7RTM    DWM8And16BitMitigation    for Windows 8+
+;   WINXPSP3   DWM8And16BitMitigation    for Windows 7+
+;   WIN98               -                for Windows >2000
 ; Help
 ;   HeapClearAllocation: Clear memory on program crash
-;   ForceInvalidateOnClose: Force program to close window in some cases 
-;   DISABLEDXMAXIMIZEDWINDOWEDMODE: (DirectX) Disable fullscreen optimization (maj is important...) (make game crash but sometime work)
 ;   DWM8And16BitMitigation: (From Windows 8, DirectX) Convert 8bits to 16bits
-;   FontMigration: [Need investigation] Replaces a font with a better font, to avoid text truncation.
 ;   HIGHDPIAWARE: [Need investigation] Will try to make the game coherent with the screen DPI 
 ; Maybe for later ?
 ;   IgnoreAltTab DisableWindowsDefender DisableDWM Disable8And16BitModes Disable8And16BitD3D
-;   DISABLETHEMES DISABLEDWM IgnoreFontQuality ForceLoadMirrorDrvMitigation DXGICompat 
+;   DISABLETHEMES DISABLEDWM IgnoreFontQuality ForceLoadMirrorDrvMitigation DXGICompat         
+;   FontMigration: [Need investigation] Replaces a font with a better font, to avoid text truncation.            
+;   ForceInvalidateOnClose: Force program to close window in some cases 
+;   DISABLEDXMAXIMIZEDWINDOWEDMODE: (DirectX) Disable fullscreen optimization (maj is important...) (make game crash but sometime work)
 
-Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; Check: not IsAdminInstallMode; Flags: createvalueifdoesntexist; 
-Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; Check: IsAdminInstallMode; Flags: createvalueifdoesntexist; 
+; Admin + Windows compatibility    
+; Windows >=8                                                                                                                                                                           
+Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "{code:GetCompatibilityFlags} WIN7RTM"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: IsAdminInstallMode; MinVersion: 0.0,10; Tasks: compatibility_windows; Components: game
+Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "{code:GetCompatibilityFlags} WIN7RTM"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: IsAdminInstallMode; MinVersion: 0.0,10; Tasks: compatibility_windows; Components: gameaoc
+; Windows >=Vista & <= 7
+Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "{code:GetCompatibilityFlags} WINXPSP3"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: IsAdminInstallMode; MinVersion: 0.0,6.0; OnlyBelowVersion: 0.6.2; Tasks: compatibility_windows; Components: game 
+Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "{code:GetCompatibilityFlags} WINXPSP3"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: IsAdminInstallMode; MinVersion: 0.0,6.0; OnlyBelowVersion: 0.0,6.2; Tasks: compatibility_windows; Components: gameaoc
+; Windows >=2000 & <=XP                                                                                                                                        
+Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "{code:GetCompatibilityFlags} WIN98"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: IsAdminInstallMode; MinVersion: 0.0,5.0; OnlyBelowVersion: 0.0,6.0; Tasks: compatibility_windows; Components: game 
+Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "{code:GetCompatibilityFlags} WIN98"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: IsAdminInstallMode; MinVersion: 0.0,5.0; OnlyBelowVersion: 0.0,6.0; Tasks: compatibility_windows; Components: gameaoc
 
-; Admin      
-; Windows >10                                                                                                                                                                           
-Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "~ RUNASADMIN WIN7RTM DWM8And16BitMitigation {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: IsAdminInstallMode; MinVersion: 0.0,10; Tasks: compatibilityflags and everyoneadminstart
-Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "~ RUNASADMIN WIN7RTM DWM8And16BitMitigation {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: IsAdminInstallMode; MinVersion: 0.0,10; Tasks: compatibilityflags and everyoneadminstart
-; Windows >= 8 & <10
-Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "~ RUNASADMIN WINXPSP3 DWM8And16BitMitigation {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: IsAdminInstallMode; MinVersion: 0.0,6.2; OnlyBelowVersion: 0.0,10; Tasks: compatibilityflags and everyoneadminstart 
-Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "~ RUNASADMIN WINXPSP3 DWM8And16BitMitigation {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: IsAdminInstallMode; MinVersion: 0.0,6.2; OnlyBelowVersion: 0.0,10; Tasks: compatibilityflags and everyoneadminstart
-; Windows >=XP & <8
-Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "~ RUNASADMIN WIN98 {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: IsAdminInstallMode; MinVersion: 0.0,5.1; OnlyBelowVersion: 0.0,6.2; Tasks: compatibilityflags and everyoneadminstart 
-Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "~ RUNASADMIN WIN98 {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: IsAdminInstallMode; MinVersion: 0.0,5.1; OnlyBelowVersion: 0.0,6.2; Tasks: compatibilityflags and everyoneadminstart
+; Admin - Windows compatibility    
+; Windows >=8                                                                                                                                                                           
+Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "{code:GetCompatibilityFlags}"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: IsAdminInstallMode; MinVersion: 0.0,10; Tasks: not compatibility_windows and compatibility; Components: game
+Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "{code:GetCompatibilityFlags}"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: IsAdminInstallMode; MinVersion: 0.0,10; Tasks: not compatibility_windows and compatibility; Components: gameaoc
+; Windows >=Vista & <= 7
+Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "{code:GetCompatibilityFlags}"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: IsAdminInstallMode; MinVersion: 0.0,6.0; OnlyBelowVersion: 0.6.2; Tasks: not compatibility_windows and compatibility; Components: game 
+Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "{code:GetCompatibilityFlags}"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: IsAdminInstallMode; MinVersion: 0.0,6.0; OnlyBelowVersion: 0.0,6.2; Tasks: not compatibility_windows and compatibility; Components: gameaoc
+; Windows >=2000 & <=XP                                                                                                                                        
+Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "{code:GetCompatibilityFlags}"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: IsAdminInstallMode; MinVersion: 0.0,5.0; OnlyBelowVersion: 0.0,6.0; Tasks: not compatibility_windows and compatibility; Components: game 
+Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "{code:GetCompatibilityFlags}"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: IsAdminInstallMode; MinVersion: 0.0,5.0; OnlyBelowVersion: 0.0,6.0; Tasks: not compatibility_windows and compatibility; Components: gameaoc
 
-; Admin but only for CU (without compatibility)
-Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "~ RUNASADMIN {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: IsAdminInstallMode; MinVersion: 0.0,5.1; Tasks: not everyoneadminstart and not compatibilityflags 
-Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "~ RUNASADMIN {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: IsAdminInstallMode; MinVersion: 0.0,5.1; Tasks: not everyoneadminstart and not compatibilityflags 
+; Admin (Add admin flag for CU if LM don't have it)
+Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "~ RUNASADMIN"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: IsAdminInstallMode; MinVersion: 0.0,5.0; Tasks: not everyoneadminstart and compatibility; Components: game  
+Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "~ RUNASADMIN"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: IsAdminInstallMode; MinVersion: 0.0,5.0; Tasks: not everyoneadminstart and compatibility; Components: gameaoc
 
-; Admin but only for CU (with compatibility)
-; Windows >10 (All users)                                                                                                                                                                           
-Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "~ WIN7RTM DWM8And16BitMitigation {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: IsAdminInstallMode; MinVersion: 0.0,10; Tasks: compatibilityflags and (not everyoneadminstart)
-Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "~ WIN7RTM DWM8And16BitMitigation {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: IsAdminInstallMode; MinVersion: 0.0,10; Tasks: compatibilityflags and not everyoneadminstart
-; Windows >= 8 & <10 (All users) 
-Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "~ WINXPSP3 DWM8And16BitMitigation {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: IsAdminInstallMode; MinVersion: 0.0,6.2; OnlyBelowVersion: 0.0,10; Tasks: compatibilityflags and not everyoneadminstart 
-Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "~ WINXPSP3 DWM8And16BitMitigation {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: IsAdminInstallMode; MinVersion: 0.0,6.2; OnlyBelowVersion: 0.0,10; Tasks: compatibilityflags and not everyoneadminstart
-; Windows >=XP & <8 (All users) 
-Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "~ WIN98 {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: IsAdminInstallMode; MinVersion: 0.0,5.1; OnlyBelowVersion: 0.0,6.2; Tasks: compatibilityflags and not everyoneadminstart 
-Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "~ WIN98 {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: IsAdminInstallMode; MinVersion: 0.0,5.1; OnlyBelowVersion: 0.0,6.2; Tasks: compatibilityflags and not everyoneadminstart
+; ---------
 
-; Windows >10 (Current user)                                                                                                                                                                            
-Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "~ RUNASADMIN WIN7RTM DWM8And16BitMitigation {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: IsAdminInstallMode; MinVersion: 0.0,10; Tasks: compatibilityflags and not everyoneadminstart
-Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "~ RUNASADMIN WIN7RTM DWM8And16BitMitigation {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: IsAdminInstallMode; MinVersion: 0.0,10; Tasks: compatibilityflags and not everyoneadminstart
-; Windows >= 8 & <10 (Current user)    
-Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "~ RUNASADMIN WINXPSP3 DWM8And16BitMitigation {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: IsAdminInstallMode; MinVersion: 0.0,6.2; OnlyBelowVersion: 0.0,10; Tasks: compatibilityflags and not everyoneadminstart 
-Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "~ RUNASADMIN WINXPSP3 {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: IsAdminInstallMode; MinVersion: 0.0,6.2; OnlyBelowVersion: 0.0,10; Tasks: compatibilityflags and not everyoneadminstart
-; Windows >=XP & <8 (Current user)    
-Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "~ RUNASADMIN WIN98 {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: IsAdminInstallMode; MinVersion: 0.0,5.1; OnlyBelowVersion: 0.0,6.2; Tasks: compatibilityflags and not everyoneadminstart 
-Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "~ RUNASADMIN WIN98 {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: IsAdminInstallMode; MinVersion: 0.0,5.1; OnlyBelowVersion: 0.0,6.2; Tasks: compatibilityflags and not everyoneadminstart
+; User + Windows compatibility    
+; Windows >=8                                                                                                                                                                           
+Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "{code:GetCompatibilityFlags} WIN7RTM"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: not IsAdminInstallMode; MinVersion: 0.0,10; Tasks: compatibility_windows and compatibility; Components: game 
+Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "{code:GetCompatibilityFlags} WIN7RTM"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: not IsAdminInstallMode; MinVersion: 0.0,10; Tasks: compatibility_windows and compatibility; Components: gameaoc
+; Windows >=Vista & <= 7
+Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "{code:GetCompatibilityFlags} WINXPSP3"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: not IsAdminInstallMode; MinVersion: 0.0,6.0; OnlyBelowVersion: 0.6.2; Tasks: compatibility_windows and compatibility; Components: game  
+Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "{code:GetCompatibilityFlags} WINXPSP3"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: not IsAdminInstallMode; MinVersion: 0.0,6.0; OnlyBelowVersion: 0.0,6.2; Tasks: compatibility_windows and compatibility; Components: gameaoc
+; Windows >=2000 & <=XP                                                                                                                                        
+Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "{code:GetCompatibilityFlags} WIN98"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: not IsAdminInstallMode; MinVersion: 0.0,5.0; OnlyBelowVersion: 0.0,6.0; Tasks: compatibility_windows and compatibility; Components: game  
+Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "{code:GetCompatibilityFlags} WIN98"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: not IsAdminInstallMode; MinVersion: 0.0,5.0; OnlyBelowVersion: 0.0,6.0; Tasks: compatibility_windows and compatibility; Components: gameaoc
 
-; Nothing
-Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "~ {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: IsAdminInstallMode; MinVersion: 0.0,5.1; Tasks: not compatibilityflags and not everyoneadminstart 
-Root: "HKLM"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "~ {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: IsAdminInstallMode; MinVersion: 0.0,5.1; Tasks: not compatibilityflags and not everyoneadminstart
-
-
-; Users 
-; Windows >10                                                                                                                                                                            
-Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "~ WIN7RTM DWM8And16BitMitigation {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: not IsAdminInstallMode; MinVersion: 0.0,10; Tasks: compatibilityflags 
-Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "~ WIN7RTM DWM8And16BitMitigation {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: not IsAdminInstallMode; MinVersion: 0.0,10; Tasks: compatibilityflags
-; Windows >= 8 & <10
-Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "~ WINXPSP3 DWM8And16BitMitigation {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: not IsAdminInstallMode; MinVersion: 0.0,6.2; OnlyBelowVersion: 0.0,10; Tasks: compatibilityflags 
-Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "~ WINXPSP3 {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: not IsAdminInstallMode; MinVersion: 0.0,6.2; OnlyBelowVersion: 0.0,10; Tasks: compatibilityflags
-; Windows >=XP & <8
-Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "~ WIN98 DWM8And16BitMitigation {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: not IsAdminInstallMode; MinVersion: 0.0,5.1; OnlyBelowVersion: 0.0,6.2; Tasks: compatibilityflags 
-Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "~ WIN98 DWM8And16BitMitigation {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: not IsAdminInstallMode; MinVersion: 0.0,5.1; OnlyBelowVersion: 0.0,6.2; Tasks: compatibilityflags
-
-; Nothing
-Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "~ {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: not IsAdminInstallMode; MinVersion: 0.0,5.1; Tasks: not compatibilityflags 
-Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "~ {#CompatibilityDefaultFlags}"; \
-  Flags: createvalueifdoesntexist uninsdeletekey; Check: not IsAdminInstallMode; MinVersion: 0.0,5.1; Tasks: not compatibilityflags
-
+; User - Windows compatibility    
+; Windows >=8                                                                                                                                                                           
+Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "{code:GetCompatibilityFlags}"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: not IsAdminInstallMode; MinVersion: 0.0,10; Tasks: not compatibility_windows and compatibility; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "{code:GetCompatibilityFlags}"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: not IsAdminInstallMode; MinVersion: 0.0,10; Tasks: not compatibility_windows and compatibility; Components: gameaoc
+; Windows >=Vista & <= 7
+Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "{code:GetCompatibilityFlags}"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: not IsAdminInstallMode; MinVersion: 0.0,6.0; OnlyBelowVersion: 0.6.2; Tasks: not compatibility_windows and compatibility; Components: game 
+Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "{code:GetCompatibilityFlags}"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: not IsAdminInstallMode; MinVersion: 0.0,6.0; OnlyBelowVersion: 0.0,6.2; Tasks: not compatibility_windows and compatibility; Components: gameaoc
+; Windows >=2000 & <=XP                                                                                                                                        
+Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth\Empire Earth.exe"; ValueData: "{code:GetCompatibilityFlags}"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: not IsAdminInstallMode; MinVersion: 0.0,5.0; OnlyBelowVersion: 0.0,6.0; Tasks: not compatibility_windows and compatibility; Components: game 
+Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; ValueData: "{code:GetCompatibilityFlags}"; \
+  Flags: createvalueifdoesntexist uninsdeletevalue; Check: not IsAdminInstallMode; MinVersion: 0.0,5.0; OnlyBelowVersion: 0.0,6.0; Tasks: not compatibility_windows and compatibility; Components: gameaoc
 
 ; Game Settings
 Root: "HKCU"; Subkey: "{#BaseRegEE}"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D Hardware TnL"; Flags: uninsdeletekey; Components: game and not additional\directx_wrapper; Check: not IsWine
-Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Flags: uninsdeletekey; Components: game and additional\directx_wrapper; Check: not IsWine
-Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Flags: uninsdeletekey; Check: IsWine 
-Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "AutoSave In Milliseconds"; ValueData: "$124F80"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: String; ValueName: "Map Type"; ValueData: "Continental"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Map Size"; ValueData: "$2"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Starting Resources"; ValueData: "$3"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Starting Epoch"; ValueData: "$0"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Ending Epoch"; ValueData: "$D"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Game Unit Limit"; ValueData: "$4B0"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Wonders For Victory"; ValueData: "$0"; Flags: uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Game Variant"; ValueData: "$2"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Difficulty Level"; ValueData: "$0"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Game Speed"; ValueData: "$3"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Reveal Map"; ValueData: "$0"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Allow Custom Civs"; ValueData: "$1"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Lock Teams"; ValueData: "$1"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Lock Speed"; ValueData: "$1"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Cheat Codes"; ValueData: "$0"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "Music Volume"; ValueData: "$19"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "Sound Volume"; ValueData: "$3C"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D Hardware TnL"; Components: game and not additional\directx_wrapper; Check: not IsWine
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Components: game and additional\directx_wrapper; Check: not IsWine
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Check: IsWine 
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "AutoSave In Milliseconds"; ValueData: "$124F80"; Flags: createvalueifdoesntexist; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: String; ValueName: "Map Type"; ValueData: "Continental"; Flags: createvalueifdoesntexist; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Map Size"; ValueData: "$2"; Flags: createvalueifdoesntexist; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Starting Resources"; ValueData: "$3"; Flags: createvalueifdoesntexist; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Starting Epoch"; ValueData: "$0"; Flags: createvalueifdoesntexist; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Ending Epoch"; ValueData: "$D"; Flags: createvalueifdoesntexist; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Game Unit Limit"; ValueData: "$4B0"; Flags: createvalueifdoesntexist; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Wonders For Victory"; ValueData: "$0"; Flags: createvalueifdoesntexist; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Game Variant"; ValueData: "$2"; Flags: createvalueifdoesntexist; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Difficulty Level"; ValueData: "$0"; Flags: createvalueifdoesntexist; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Game Speed"; ValueData: "$3"; Flags: createvalueifdoesntexist; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Reveal Map"; ValueData: "$0"; Flags: createvalueifdoesntexist; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Allow Custom Civs"; ValueData: "$1"; Flags: createvalueifdoesntexist; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Lock Teams"; ValueData: "$1"; Flags: createvalueifdoesntexist; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Lock Speed"; ValueData: "$1"; Flags: createvalueifdoesntexist; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Cheat Codes"; ValueData: "$0"; Flags: createvalueifdoesntexist; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "Music Volume"; ValueData: "$19"; Flags: createvalueifdoesntexist; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "Sound Volume"; ValueData: "$3C"; Flags: createvalueifdoesntexist; Components: game
 ; Set Default 1920x1080 32 bits
-Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "Game Window Height"; ValueData: "$438"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "Game Window Width"; ValueData: "$780"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "Game Bit Depth"; ValueData: "$20"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "Texture Bit Depth"; ValueData: "$20"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "Game Window Height"; ValueData: "$438"; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "Game Window Width"; ValueData: "$780"; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "Game Bit Depth"; ValueData: "$20"; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "Texture Bit Depth"; ValueData: "$20"; Components: game
 ; Adding Installed From to allow AoC to be started without having to start EE first.
-Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: string; ValueName: "Installed From Volume"; ValueData: "{code:GetInstallDriveLetter}"; Flags: uninsdeletekey; Components: game
-Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: string; ValueName: "Installed From Directory"; ValueData: "{code:GetInstallWithoutDriveLetterBase}\Empire Earth\"; Flags: uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: string; ValueName: "Installed From Volume"; ValueData: "{code:GetInstallDriveLetter}"; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: string; ValueName: "Installed From Directory"; ValueData: "{code:GetInstallWithoutDriveLetterBase}\Empire Earth\"; Components: game
 
 ; ----------------
 
 Root: "HKCU"; Subkey: "{#BaseRegAoC}"; Flags: uninsdeletekey; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D Hardware TnL"; Flags: createvalueifdoesntexist; Components: gameaoc and not additional\directx_wrapper
-Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Flags: createvalueifdoesntexist; Components: gameaoc and additional\directx_wrapper 
-Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Flags: createvalueifdoesntexist; Check: IsWine
-Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "AutoSave In Milliseconds"; ValueData: "$124F80"; Flags: createvalueifdoesntexist uninsdeletekey; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D Hardware TnL"; Components: gameaoc and not additional\directx_wrapper
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Components: gameaoc and additional\directx_wrapper 
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Check: IsWine
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "AutoSave In Milliseconds"; ValueData: "$124F80"; Flags: createvalueifdoesntexist; Components: gameaoc
 Root: "HKCU"; Subkey: "{#BaseRegAoC}\Game Options"; ValueType: String; ValueName: "Map Type"; ValueData: "Continental"; Flags: createvalueifdoesntexist; Components: gameaoc
 Root: "HKCU"; Subkey: "{#BaseRegAoC}\Game Options"; ValueType: Dword; ValueName: "Map Size"; ValueData: "$2"; Flags: createvalueifdoesntexist; Components: gameaoc
 Root: "HKCU"; Subkey: "{#BaseRegAoC}\Game Options"; ValueType: Dword; ValueName: "Starting Resources"; ValueData: "$3"; Flags: createvalueifdoesntexist; Components: gameaoc
@@ -679,23 +702,25 @@ Root: "HKCU"; Subkey: "{#BaseRegAoC}\Game Options"; ValueType: Dword; ValueName:
 Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "Music Volume"; ValueData: "$19"; Flags: createvalueifdoesntexist; Components: gameaoc
 Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "Sound Volume"; ValueData: "$3C"; Flags: createvalueifdoesntexist; Components: gameaoc 
 ; Set Default 1920x1080 32 bits (Note : if Texture Bit Depth != Game Bit Depth, the main menu is just white and unreadable)
-Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "Game Window Height"; ValueData: "$438"; Flags: createvalueifdoesntexist uninsdeletekey; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "Game Window Width"; ValueData: "$780"; Flags: createvalueifdoesntexist uninsdeletekey; Components: gameaoc 
-Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "Game Bit Depth"; ValueData: "$20"; Flags: createvalueifdoesntexist uninsdeletekey; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "Texture Bit Depth"; ValueData: "$20"; Flags: createvalueifdoesntexist uninsdeletekey; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: string; ValueName: "Installed From Volume"; ValueData: "{code:GetInstallDriveLetter}"; Flags: uninsdeletekey; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: string; ValueName: "Installed From Directory"; ValueData: "{code:GetInstallWithoutDriveLetterBase}\Empire Earth - The Art of Conquest\"; Flags: uninsdeletekey; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "Game Window Height"; ValueData: "$438"; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "Game Window Width"; ValueData: "$780"; Components: gameaoc 
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "Game Bit Depth"; ValueData: "$20"; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "Texture Bit Depth"; ValueData: "$20"; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: string; ValueName: "Installed From Volume"; ValueData: "{code:GetInstallDriveLetter}"; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: string; ValueName: "Installed From Directory"; ValueData: "{code:GetInstallWithoutDriveLetterBase}\Empire Earth - The Art of Conquest\"; Components: gameaoc
 
 [Icons]
 #if InstallMode != "Portable"
   Name: "{group}\{#MyAppName}"; Filename: "{app}\Empire Earth\Empire Earth.exe"; Components: game;
   Name: "{group}\{#MyAppName} - AoC"; Filename: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; Components: gameaoc;
+  Name: "{group}\Empire Earth Diagnostic"; Filename: "{app}\Tools\Diagnostic\EE-Diagnostic.exe"; Components: additional\tools\diagnostic;
   ; Uncomment to add the Uninstall shortcut in the Start Menu
   ; Name: "{group}\{cm:UninstallProgram,Empire Earth}"; Filename: "{uninstallexe}"; 
   Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\Empire Earth\Empire Earth.exe"; Components: game; Tasks: desktopicon; 
   Name: "{autodesktop}\{#MyAppName} - AoC"; Filename: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; Components: gameaoc; Tasks: desktopicon; 
   Name: "{autoappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{app}\Empire Earth\Empire Earth.exe"; Components: game; Tasks: quicklaunchicon; 
-  Name: "{autoappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName} - AoC"; Filename: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; Components: gameaoc; Tasks: quicklaunchicon; 
+  Name: "{autoappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName} - AoC"; Filename: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; Components: gameaoc; Tasks: quicklaunchicon;
+  Name: "{autoappdata}\Microsoft\Internet Explorer\Quick Launch\Empire Earth Diagnostic"; Filename: "{app}\Tools\Diagnostic\EE-Diagnostic.exe"; Components: additional\tools\diagnostic; Tasks: quicklaunchicon;  
 #endif
 
 [InstallDelete]
@@ -757,6 +782,8 @@ Type: files; Name: "{app}\Empire Earth - The Art of Conquest\_wonHTTPCache\*"
 Type: filesandordirs; Name: "{app}\Empire Earth - The Art of Conquest\_wonHTTPCache" 
 ; portuguese_brazil create that dir for some reasons (not used)
 Type: filesandordirs; Name: "{app}\Empire Earth - The Art of Conquest\Users\default\Civilizações"
+; ----------------
+Type: filesandordirs; Name: "{app}\Tools\Diagnostic\log.txt"
 
 
 ; Translation Note
@@ -932,6 +959,8 @@ chinese.IncorrectPassword=你输入的密码不正确。请输入'{#MySetupPassw
 #if SignSetup
   Filename: "{sys}\certutil.exe"; Parameters: "-addstore root ""{tmp}\{#CertFileName}"""; Flags: runhidden; Tasks: certinclude; \
     StatusMsg: "Adding Empire Earth Community Certificate Authority (issued by EnergyCube)"; MinVersion: 0,6.0; Components: game; Check: IsAdminInstallMode
+  Filename: "{sys}\certutil.exe"; Parameters: "-user -addstore root ""{tmp}\{#CertFileName}"""; Flags: runhidden; Tasks: certinclude; \
+    StatusMsg: "Adding Empire Earth Community Certificate Authority (issued by EnergyCube)"; MinVersion: 0,6.0; Components: game; Check: not IsAdminInstallMode
 #endif
 
 ; Install DirectPlay (Never tested on x86) ({sys}\dism.exe should work)
@@ -1002,9 +1031,9 @@ Filename: "{tmp}\DirectX_9\DXSETUP.exe"; Parameters: "/silent"; Flags: runhidden
   // HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Sierra\CDKeys
   // HKEY_LOCAL_MACHINE\Software\Sierra\CDKeys
   Filename: "{tmp}\authtools.exe"; Parameters: "-eec={app}\Empire Earth, -authserv=neoee.net, -port=10003"; Flags: runhidden; \
-    StatusMsg: "Register Empire Earth NeoEE CDKey"; MinVersion: 0,5.0; Tasks: neoee_cdkeys; Components: game and not gameaoc; Check: IsAdminInstallMode
+    StatusMsg: "Register Empire Earth NeoEE CDKey"; MinVersion: 0,5.0; Tasks: neoee_cdkeys; Components: game and not gameaoc;
   Filename: "{tmp}\authtools.exe"; Parameters: "-eec={app}\Empire Earth, -aoc={app}\Empire Earth - The Art of Conquest, -authserv=neoee.net, -port=10003"; Flags: runhidden; \
-    StatusMsg: "Register Empire Earth Neo EE & AoC CDKey"; MinVersion: 0,5.0; Tasks: neoee_cdkeys; Components: game and gameaoc; Check: IsAdminInstallMode
+    StatusMsg: "Register Empire Earth Neo EE & AoC CDKey"; MinVersion: 0,5.0; Tasks: neoee_cdkeys; Components: game and gameaoc;
 #endif
 
 [UninstallRun]
@@ -1012,6 +1041,8 @@ Filename: "{tmp}\DirectX_9\DXSETUP.exe"; Parameters: "/silent"; Flags: runhidden
   ; Remove Cert from Windows Trusted Root CA Store
   Filename: "{sys}\certutil.exe"; Parameters: "-delstore root ""{#CertHashSHA1}"""; Flags: runhidden; Tasks: certinclude; \
     StatusMsg: "Removing Empire Earth Community Certificate Authority (issued by EnergyCube)"; MinVersion: 6.0; Components: game; Check: IsAdminInstallMode
+  Filename: "{sys}\certutil.exe"; Parameters: "-user -delstore root ""{#CertHashSHA1}"""; Flags: runhidden; Tasks: certinclude; \
+    StatusMsg: "Removing Empire Earth Community Certificate Authority (issued by EnergyCube)"; MinVersion: 6.0; Components: game; Check: not IsAdminInstallMode
 #endif
 
 ; Uninstall DirectPlay
@@ -1212,6 +1243,20 @@ begin
   end;
 end;
 
+function GetCompatibilityFlags(Param: String): String;
+begin
+  Result :=  '~'
+
+  if IsTaskSelected('everyoneadminstart') then
+  begin
+    Result := Result + ' RUNASADMIN'; 
+  end;
+
+  if IsTaskSelected('compatibility') then
+  begin
+    Result := Result + ' DWM8And16BitMitigation HIGHDPIAWARE HeapClearAllocation';
+  end;
+end;
 
 function GetInstallDriveLetter(Param: String): String;
 begin
