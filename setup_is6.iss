@@ -81,8 +81,10 @@
 ;         | Fixed wrong regedit compatibility delete that was deleting the entire (Layers) key  
 ;         | Reworked compatibility flags, with fewer flags and better admin rights                  
 ;         | Added Empire Earth Diagnostic, a simple tool giving install informations (.NET 4) 
+;         | Better certificate uninstall (check if another game is instaleld)
 ;         | Allow to install the certificate as user
-; ---------------------------------------  
+;         | Redirected chinese traditional setup messages to chinese
+; --------------------------------------- 
 
 ; SETUP SETTINGS
 
@@ -713,14 +715,14 @@ Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: string; ValueName: "Installed 
 #if InstallMode != "Portable"
   Name: "{group}\{#MyAppName}"; Filename: "{app}\Empire Earth\Empire Earth.exe"; Components: game;
   Name: "{group}\{#MyAppName} - AoC"; Filename: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; Components: gameaoc;
-  Name: "{group}\Empire Earth Diagnostic"; Filename: "{app}\Tools\Diagnostic\EE-Diagnostic.exe"; Components: additional\tools\diagnostic;
+  Name: "{group}\{#MyAppName} Diagnostic"; Filename: "{app}\Tools\Diagnostic\EE-Diagnostic.exe"; Parameters: "{#SetupSetting("AppId")}_is1"; MinVersion: 0.0,5.0; Components: additional\tools\diagnostic;
   ; Uncomment to add the Uninstall shortcut in the Start Menu
   ; Name: "{group}\{cm:UninstallProgram,Empire Earth}"; Filename: "{uninstallexe}"; 
   Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\Empire Earth\Empire Earth.exe"; Components: game; Tasks: desktopicon; 
   Name: "{autodesktop}\{#MyAppName} - AoC"; Filename: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; Components: gameaoc; Tasks: desktopicon; 
   Name: "{autoappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{app}\Empire Earth\Empire Earth.exe"; Components: game; Tasks: quicklaunchicon; 
   Name: "{autoappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName} - AoC"; Filename: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"; Components: gameaoc; Tasks: quicklaunchicon;
-  Name: "{autoappdata}\Microsoft\Internet Explorer\Quick Launch\Empire Earth Diagnostic"; Filename: "{app}\Tools\Diagnostic\EE-Diagnostic.exe"; Components: additional\tools\diagnostic; Tasks: quicklaunchicon;  
+  Name: "{autoappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName} Diagnostic"; Filename: "{app}\Tools\Diagnostic\EE-Diagnostic.exe"; Parameters: "{#SetupSetting("AppId")}_is1"; MinVersion: 0.0,5.0; Components: additional\tools\diagnostic; Tasks: quicklaunchicon;  
 #endif
 
 [InstallDelete]
@@ -799,6 +801,7 @@ spanish.AntiVirusWarning=Se recomienda encarecidamente desactivar el AntiVirus a
 russian.AntiVirusWarning=Настоятельно рекомендуется отключить ваш антивирус перед установкой.%nНо вы не столкнетесь с какими-либо проблемами, если не отключите его.
 polish.AntiVirusWarning=Mimo że nie powinieneś napotkać żadnych problemów podczas instalacji.%nZalecamy wyłączyć program antywirusowy przed rozpoczęciem instalacji, w celu uniknięcia dodatkowych problemów.
 chinese.AntiVirusWarning=强烈建议在安装前禁用你的反病毒软件。%n但如果你不禁用它，应该不会遇到任何问题。
+chinese_traditional.AntiVirusWarning=强烈建议在安装前禁用你的反病毒软件。%n但如果你不禁用它，应该不会遇到任何问题。
 korean.AntiVirusWarning=설치하기 전에 바이러스 백신을 사용하지 않도록 설정하는 것이 좋습니다.%n그러나 비활성화하지 않으면 문제가 발생하지 않아야합니다.
 
 ; Legal
@@ -810,6 +813,7 @@ spanish.LegalQuestion=¿Tiene el juego original y su expansión (o la Gold Editi
 russian.LegalQuestion=Есть ли у вас оригинальная игра и ее расширение (или Gold Edition) на CD с действующими ключами или вы приобрели игру в цифровом виде?
 polish.LegalQuestion=Czy posiadasz oryginalną grę i dodatek (lub Gold Edycję) na CD z kluczami instalacyjnymi, czy też zakupiłeś grę cyfrowo?
 chinese.LegalQuestion=你是否有原版游戏及其扩展版（或Gold版）的CD和有效的钥匙，或者你是通过数字方式购买游戏？
+chinese_traditional.LegalQuestion=你是否有原版游戏及其扩展版（或Gold版）的CD和有效的钥匙，或者你是通过数字方式购买游戏？
 korean.LegalQuestion=유효한 키가 있는 CD에 오리지널 게임과 확장(또는 Gold 에디션)이 있거나 디지털 방식으로 게임을 구입했습니까?
 
 ; Portable
@@ -845,11 +849,15 @@ chinese.PortableQuestion=你目前运行的是便携式版本的安装程序。�
 在便携式模式下的安装程序不能被卸载，因为它只是游戏文件的一个副本。 \
 %n如果你不知道你在做什么，请使用普通版本的安装程序。 \
 %n%n你想继续安装吗？
+chinese_traditional.PortableQuestion=你目前运行的是便携式版本的安装程序。这个版本是为了让你在可移动设备（USB）上播放。 \
+在便携式模式下的安装程序不能被卸载，因为它只是游戏文件的一个副本。 \
+%n如果你不知道你在做什么，请使用普通版本的安装程序。 \
+%n%n你想继续安装吗？
 korean.PortableQuestion=현재 설치 프로그램의 휴대용 버전을 실행 중입니다. 이 버전은 이동식 장치(USB)에서 재생할 수 있도록 하기 위해 만들어졌습니다. \
 %n휴대용 모드의 설치는 단순히 게임 파일의 복사본이기 때문에 제거 할 수 없습니다. \
 %n당신이 무엇을하고 있는지 모르는 경우 설치 프로그램의 일반 버전을 사용하시기 바랍니다. \
 %n%n설치를 계속하시겠습니까?
-
+ 
 ; Game Update
 GameUpdate=The game included in this setup is not up to date ({#MyAppVersion} => [LAST]), please update or YOU MAY NOT BE ABLE TO PLAY WITH OTHER PLAYERS. \
 %n%nWould you like to download the latest version?
@@ -867,9 +875,11 @@ polish.GameUpdate=Wersja gry znajdująca się w tym programie instalacyjnym jest
 %n%nCzy chcesz pobrać teraz najnowszą wersję?
 chinese.GameUpdate=这个设置中包含的游戏不是最新的（{#MyAppVersion} => [LAST]），请更新，否则你可能无法与其他玩家一起玩。 \
 %n%n你想下载最新的版本吗？
+chinese_traditional.GameUpdate=这个设置中包含的游戏不是最新的（{#MyAppVersion} => [LAST]），请更新，否则你可能无法与其他玩家一起玩。 \
+%n%n你想下载最新的版本吗？
 korean.GameUpdate=이 설정에 포함된 게임은 최신 상태({#MyAppVersion} => [LAST]) 최신 게임이 아니며, 업데이트해 주거나 다른 플레이어와 플레이할 수 없을 수도 있습니다. \
 %n%n최신 버전을 다운로드하시겠습니까?
-
+ 
 ; Setup Update
 SetupUpdate=The setup is not up to date ({#MySetupVersion} => [LAST]), it is strongly recommended to use the latest version to benefit from the latest fixes and compatibility improvements. \
 %n%nWould you like to download the latest version?
@@ -887,9 +897,11 @@ polish.SetupUpdate=Wersja instalatora jest nieaktualna ({#MySetupVersion} => [LA
 %n%nCzy chcesz pobrać teraz najnowszą wersję instalatora?
 chinese.SetupUpdate=安装程序不是最新的（{#MySetupVersion} => [LAST]），强烈建议使用最新的版本以受益于最新的修复和兼容性改进。 \
 %n%n你想下载最新的版本吗？
+chinese_traditional.SetupUpdate=安装程序不是最新的（{#MySetupVersion} => [LAST]），强烈建议使用最新的版本以受益于最新的修复和兼容性改进。 \
+%n%n你想下载最新的版本吗？
 korean.SetupUpdate=설치 프로그램은 최신 ({#MySetupVersion} => [LAST]) 최신 버전의 혜택을 누리는 것이 좋습니다. \
 %n%n최신 버전을 다운로드하시겠습니까?
-
+  
 ; AlreadyInstalled
 AlreadyInstalled=It seems that {#MyAppName} has already been installed. \
 %nIt is recommended that you uninstall and install. \
@@ -923,10 +935,45 @@ chinese.AlreadyInstalled=似乎{#MyAppName}已经被安装了。 \
 建议您卸载并安装。 \
 %n当卸载时，游戏保存被保留。 \
 %n%n你想继续安装吗？
+chinese_traditional.AlreadyInstalled=似乎{#MyAppName}已经被安装了。 \
+建议您卸载并安装。 \
+%n当卸载时，游戏保存被保留。 \
+%n%n你想继续安装吗？
 korean.AlreadyInstalled={#MyAppName}가 이미 설치된 것 같습니다. \
 %n제거 하 고 설치 하는 것이 좋습니다. \
 %n게임 저장은 제거 할 때 유지됩니다. \
 %n%n설치를 계속하시겠습니까?
+ 
+UserInstallMode=You are using the user mode installation, which means that you will not need administrator rights for the installation. \
+%nPlease note that this mode is not able to register the game with the computer's firewall, which may prevent you from hosting games (but you should still be able to join games). \
+%nIf you have administrator rights on the machine, prefer the administrator mode.
+french.UserInstallMode=Vous utilisez l'installation en mode utilisateur, ce qui signifie que vous n'aurez pas besoin de droits d'administrateur pour l'installation. \
+%nVeuillez noter que ce mode n'est pas en mesure d'enregistrer le jeu auprès du pare-feu de l'ordinateur, ce qui peut vous empêcher d'héberger des parties (mais vous devriez toujours pouvoir rejoindre des parties). \
+%n%nSi vous avez des droits administrateur sur la machine, préférez le mode administrateur.
+german.UserInstallMode=Sie verwenden die Installation im Benutzermodus, was bedeutet, dass Sie für die Installation keine Administratorrechte benötigen. \
+Bitte beachten Sie, dass dieser Modus nicht in der Lage ist, das Spiel bei der Firewall des Computers zu registrieren, was Sie möglicherweise daran hindert, Spiele zu veranstalten (Sie sollten aber trotzdem in der Lage sein, Spielen beizutreten). \
+%nWenn Sie über Administratorrechte auf dem Computer verfügen, wählen Sie den Administratormodus.
+italian.UserInstallMode=Stai usando l'installazione in modalità utente, il che significa che non avrai bisogno dei diritti di amministratore per l'installazione. \
+%nNota che questa modalità non è in grado di registrare il gioco con il firewall del computer, il che potrebbe impedirti di ospitare le partite (ma dovresti comunque essere in grado di partecipare alle partite). \
+%nSe hai i diritti di amministratore sulla macchina, preferisci la modalità amministratore.
+spanish.UserInstallMode=Está utilizando la instalación en modo usuario, lo que significa que no necesitará derechos de administrador para la instalación. \
+%nTenga en cuenta que este modo no es capaz de registrar el juego con el cortafuegos del ordenador, lo que puede impedirle alojar partidas (pero debería poder unirse a ellas). \
+%nSi tienes derechos de administrador en la máquina, prefiere el modo administrador.
+russian.UserInstallMode=Вы используете установку в режиме пользователя, что означает, что вам не нужны права администратора для установки. \
+%nПримите во внимание, что этот режим не может зарегистрировать игру в брандмауэре компьютера, что может помешать вам проводить игры (но вы все равно должны иметь возможность присоединяться к играм). \
+%nЕсли у вас есть права администратора на компьютере, предпочитайте режим администратора.
+polish.UserInstallMode=Używasz instalacji w trybie użytkownika, co oznacza, że nie będziesz potrzebował praw administratora do instalacji. \
+%nNależy pamiętać, że ten tryb nie jest w stanie zarejestrować gry w zaporze sieciowej komputera, co może uniemożliwić organizowanie gier (ale nadal powinieneś mieć możliwość dołączania do gier). \
+%nJeśli masz prawa administratora na komputerze, wybierz tryb administratora.
+chinese.UserInstallMode=你使用的是用户模式安装，这意味着你不需要管理员权限就可以安装。 \
+%n请注意，这种模式不能在计算机的防火墙上注册游戏，这可能会妨碍你主持游戏（但你应该仍然能够加入游戏）。 \
+%n如果你在机器上有管理员权限，请选择管理员模式。
+chinese_traditional.UserInstallMode=你使用的是用户模式安装，这意味着你不需要管理员权限就可以安装。 \
+%n请注意，这种模式不能在计算机的防火墙上注册游戏，这可能会妨碍你主持游戏（但你应该仍然能够加入游戏）。 \
+%n如果你在机器上有管理员权限，请选择管理员模式。
+korean.UserInstallMode=사용자 모드 설치를 사용하고 있으므로 설치에 대한 관리자 권한이 필요하지 않습니다. \
+%n이 모드는 컴퓨터의 방화벽으로 게임을 등록할 수 없으며, 이는 게임을 호스팅하는 것을 방지할 수 있습니다(하지만 여전히 게임에 참여할 수 있어야 합니다). \
+%n컴퓨터에 관리자 권한이 있는 경우 관리자 모드를 선호합니다.
 
 ; Sound Control
 ; Since our custom button isn't auto scaled to content
@@ -952,6 +999,10 @@ polish.PasswordLabel3=Proszę wpisać '{#MySetupPassword}' (z uwzględnieniem wi
 polish.IncorrectPassword=Wprowadzone hasło jest nieprawidłowe. Proszę wpisać '{#MySetupPassword}' (z uwzględnieniem wielkości liter).
 chinese.PasswordLabel3=请写上'{#MySetupPassword}'（区分大小写），然后点击下一步继续。
 chinese.IncorrectPassword=你输入的密码不正确。请输入'{#MySetupPassword}'（区分大小写）。
+chinese_traditional.PasswordLabel3=请写上'{#MySetupPassword}'（区分大小写），然后点击下一步继续。
+chinese_traditional.IncorrectPassword=你输入的密码不正确。请输入'{#MySetupPassword}'（区分大小写）。
+korean.PasswordLabel3='{#MySetupPassword}'(사례 에 민감한)를 작성한 다음 다음을 클릭하여 계속하십시오.
+korean.IncorrectPassword=입력한 암호가 올바르지 않습니다. '{#MySetupPassword}'(사례 에 민감한)를 입력하십시오.
 ; BeveledLabel=Little message at the bottom of the setup in case we want but it's ugly
 
 [Run]
@@ -1037,14 +1088,6 @@ Filename: "{tmp}\DirectX_9\DXSETUP.exe"; Parameters: "/silent"; Flags: runhidden
 #endif
 
 [UninstallRun]
-#if SignSetup
-  ; Remove Cert from Windows Trusted Root CA Store
-  Filename: "{sys}\certutil.exe"; Parameters: "-delstore root ""{#CertHashSHA1}"""; Flags: runhidden; Tasks: certinclude; \
-    StatusMsg: "Removing Empire Earth Community Certificate Authority (issued by EnergyCube)"; MinVersion: 6.0; Components: game; Check: IsAdminInstallMode
-  Filename: "{sys}\certutil.exe"; Parameters: "-user -delstore root ""{#CertHashSHA1}"""; Flags: runhidden; Tasks: certinclude; \
-    StatusMsg: "Removing Empire Earth Community Certificate Authority (issued by EnergyCube)"; MinVersion: 6.0; Components: game; Check: not IsAdminInstallMode
-#endif
-
 ; Uninstall DirectPlay
 ; Disabled because seems useless
 ; Filename: "{win}\System32\dism.exe"; Parameters: "/Online /Disable-Feature /FeatureName:""DirectPlay"" /NoRestart"; Flags: runhidden runascurrentuser; \
@@ -1372,11 +1415,6 @@ begin
   except
     MsgBox('Unnable to check update!', mbError, MB_OK);
   end;
-
-  // Portable Question
-  if (WizardSupressMsgBoxes = False) and (ExpandConstant('{#InstallMode}') = 'Portable') then
-    if MsgBox(ExpandConstant('{cm:PortableQuestion}'), mbConfirmation, MB_YESNO) = IDNO then
-      Exit;
   
   // Already Installed
   if (WizardSupressMsgBoxes = False) and
@@ -1416,15 +1454,28 @@ begin
     if WizardSupressMsgBoxes = False then
       MsgBox('THIS IS A TEST SETUP ID = {#TestID} [Setup v{#MySetupVersion} - Game v{#MyAppVersion}]' + #13#10 + 'PLEASE USE THIS INSTALLER ONLY FOR TESTING' + #13#10 + 'DO >>NOT<< SHARE IT!' , mbInformation, MB_OK);
   #endif
-    
-  // AntiVirus Warning
-  if WizardSupressMsgBoxes = False then
-    MsgBox(ExpandConstant('{cm:AntiVirusWarning}'), mbInformation, MB_OK);
+  
+  // AntiVirus/Portable/User Warning
+  if (WizardSupressMsgBoxes = False) then
+  begin
+    if IsAdminInstallMode then
+    begin
+      MsgBox(ExpandConstant('{cm:AntiVirusWarning}'), mbInformation, MB_OK);
+    end
+    else if (ExpandConstant('{#InstallMode}') = 'Portable') then
+    begin
+      if MsgBox(ExpandConstant('{cm:PortableQuestion}'), mbConfirmation, MB_YESNO) = IDNO then
+        Exit;
+    end
+    else begin
+      MsgBox(ExpandConstant('{cm:UserInstallMode}'), mbInformation, MB_OK);
+    end;
+  end;
   
   #if InstallType == "NeoEE"
     // Wine Environment Detection
     if IsWine() and (WizardSupressMsgBoxes = False) then
-      MsgBox('Wine Detected !#13#10NeoEE connection GUI which causes the game to crash because it uses GDI will be disabled.', mbInformation, MB_OK);
+      MsgBox('Wine Detected !' + #13#10 + 'NeoEE connection GUI which causes the game to crash because it uses GDI will be disabled.', mbInformation, MB_OK);
   #endif
   
   #if AudioModule
@@ -1444,6 +1495,140 @@ begin
   
   Result :=  True;
 end;
+
+function IsAnotherGameInstalled(Params: String): Boolean;
+begin
+  Result := False;
+
+  #if InstallType == "EE"
+      // EE
+      if RegValueExists(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{A24FCC7A-5491-4FEA-837B-4E4430C349DA}_is1', 'UninstallString')
+      or RegValueExists(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{A24FCC7A-5491-4FEA-837B-4E4430C349DA}_is1', 'UninstallString')
+      then begin
+        Result := True;
+      end;
+  #elif InstallType == "NeoEE"
+      // NeoEE
+      if RegValueExists(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{4C0B46D8-E7EB-4B95-97D4-A578D9B914C6}_is1', 'UninstallString')
+      or RegValueExists(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{4C0B46D8-E7EB-4B95-97D4-A578D9B914C6}_is1', 'UninstallString')
+      then begin
+        Result := True;
+      end;
+  #endif
+
+end;
+
+function IsAnotherGameInstalledWithCertificate: Boolean;
+var
+  Tmp: String;
+begin
+  Result := False;
+  #if InstallType == "EE"
+      // EE
+
+      if not IsAdminInstallMode and RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{A24FCC7A-5491-4FEA-837B-4E4430C349DA}_is1', 'Inno Setup: Selected Tasks', Tmp)
+      then begin
+        if Pos('certinclude', Tmp) > 0 then
+        begin
+          Result := True;
+          exit;
+        end;
+      end;
+
+      if IsAdminInstallMode and RegQueryStringValue(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{A24FCC7A-5491-4FEA-837B-4E4430C349DA}_is1', 'Inno Setup: Selected Tasks', Tmp)
+      then begin
+        if Pos('certinclude', Tmp) > 0 then
+        begin
+          Result := True;
+          exit;
+        end;
+      end;
+  #elif InstallType == "NeoEE"
+      // NeoEE
+      if not IsAdminInstallMode and RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{4C0B46D8-E7EB-4B95-97D4-A578D9B914C6}_is1', 'Inno Setup: Selected Tasks', Tmp)
+      then begin   
+        if Pos('certinclude', Tmp) > 0 then
+        begin
+          Result := True;
+          exit;
+        end;
+      end;
+
+      if IsAdminInstallMode and RegQueryStringValue(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{4C0B46D8-E7EB-4B95-97D4-A578D9B914C6}_is1', 'Inno Setup: Selected Tasks', Tmp)
+      then begin   
+        if Pos('certinclude', Tmp) > 0 then
+        begin
+          Result := True;
+          exit;
+        end;
+      end;
+  #endif  
+end;
+
+function WizardIsComponentSelectedCompatible(Compo: String): Boolean;
+var
+  Tmp: String;
+begin
+  Result := False;
+  #if InstallType == "EE"
+      // EE
+      if RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{4C0B46D8-E7EB-4B95-97D4-A578D9B914C6}_is1', 'Inno Setup: Selected Tasks', Tmp)
+      then begin   
+        if Pos(Compo, Tmp) > 0 then
+        begin
+          Result := True;
+          exit;
+        end;
+      end;
+
+      if RegQueryStringValue(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{4C0B46D8-E7EB-4B95-97D4-A578D9B914C6}_is1', 'Inno Setup: Selected Tasks', Tmp)
+      then begin   
+        if Pos(Compo, Tmp) > 0 then
+        begin
+          Result := True;
+          exit;
+        end;
+      end;
+      
+  #elif InstallType == "NeoEE"
+      // NeoEE
+      if RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{A24FCC7A-5491-4FEA-837B-4E4430C349DA}_is1', 'Inno Setup: Selected Tasks', Tmp)
+      then begin
+        if Pos(Compo, Tmp) > 0 then
+        begin
+          Result := True;
+          exit;
+        end;
+      end;
+
+      if RegQueryStringValue(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{A24FCC7A-5491-4FEA-837B-4E4430C349DA}_is1', 'Inno Setup: Selected Tasks', Tmp)
+      then begin
+        if Pos(Compo, Tmp) > 0 then
+        begin
+          Result := True;
+          exit;
+        end;
+      end;
+  #endif  
+end;
+
+#if CertInclude
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+var
+  ErrorCode: Integer;
+begin
+  if (CurUninstallStep = usUninstall) and (WizardIsComponentSelectedCompatible('certinclude')) then begin
+    if IsAdminInstallMode and not IsAnotherGameInstalledWithCertificate then
+    begin
+      Exec(ExpandConstant('{sys}\certutil.exe'), '-delstore root ""{#CertHashSHA1}"""', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
+    end
+    else if not IsAnotherGameInstalledWithCertificate and not IsAdminInstallMode then
+    begin
+      Exec(ExpandConstant('{sys}\certutil.exe'), '-user -delstore root ""{#CertHashSHA1}""', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
+    end;
+  end;
+end;
+#endif
 
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
