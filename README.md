@@ -1,14 +1,14 @@
 ![Visitor count](https://shields-io-visitor-counter.herokuapp.com/badge?page=EE-modders.Empire-Earth-Setup)
 [![GitHub stars](https://img.shields.io/github/stars/EE-modders/Empire-Earth-Setup)](https://github.com/EE-modders/Empire-Earth-Setup/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/EnergyCube/MySoloRPG)](https://github.com/EnergyCube/MySoloRPG/network)
-[![Setup Version](https://img.shields.io/badge/Setup%20Version-v1.0.0.0-blue)](https://github.com/EnergyCube/MySoloRPG)
+[![GitHub forks](https://img.shields.io/github/forks/EnergyCube/MySoloRPG)](https://github.com/EE-modders/Empire-Earth-Setup/network)
+[![Setup Version](https://img.shields.io/badge/Setup%20Version-v1.0.1.0-blue)](https://github.com/EE-modders/Empire-Earth-Setup)
 # 📥 Empire Earth Community Setup
 
 ## Features
 🎮 Empire Earth & The Art of Conquest\
 🌐 NeoEE (with CD Keys generation)\
-📣 Discord Status\
 🗺️ Support 11 languages\
+📣 Discord Status\
 📥 Download localized content online (support mirror)\
 ✅ Online update checker (support mirror)\
 🖥️ DirectX Wrapper (DX9 with GOG dll and DX12 with dgVoodoo dll)\
@@ -17,7 +17,9 @@
 ➕ dreXmod 2\
 🔥 Registered in Firewall (Admin)\
 📥 DirectX 9 Install (when using DirectX Wrapper for DirectX 9)\
-🔐 Digitally signed
+🔑 You can now register NeoEE without admin right\
+🛠️ New tool included: Empire Earth Diagnostic v1.0.0.0\
+🔐 Digitally (self-)signed
 
 ## Notes for Modders
 Empire Earth is very sensitive to version change (which leads to multiplayer incompatibility), some modders might be interested in using this setup to deliver their mods. Please do not do this unless you have created a really popular and functional modpack. We must avoid creating multiple versions of the game to avoid fracturing the community.
