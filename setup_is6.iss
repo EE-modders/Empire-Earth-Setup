@@ -84,11 +84,23 @@
 ;         | Better certificate uninstall (check if another game is instaleld)
 ;         | Allow to install the certificate as user
 ;         | Redirected chinese traditional setup messages to chinese
-; --------------------------------------- 
+; ---------------------------------------
+; 1.0.2.0 | NeoEE Map fix, new HD content inc. icons with/witout letters
+;         |------------------------------
+;         | Fixed invalid maps on NeoEE
+;         | Fixed EE:Diagnostic error while EE running
+;         | Reworked WON Lobby Dialog images
+;         | Added tips for recommanded multiplayer max pop for NeoEE
+;         | Updated HD Icons by Fortukin
+;         | Added HD Icons with localized letters
+;         | Added some HD terrain textures from Yukon mod
+;         | Better file clean-up (OOS, UPnP)
+;         | Reworked Omega content management in the Setup
+; ---------------------------------------
 
 ; SETUP SETTINGS
 
-#define MySetupVersion "1.0.1.0"
+#define MySetupVersion "1.0.2.0"
 #define MyAppExeName "Empire Earth.exe"
 #define MyAppGroupName "Empire Earth" 
 
@@ -335,20 +347,23 @@ Name: "gameaoc\update"; Description: "**Try** to download {language} voices and 
 Name: "additional"; Description: "Additional Recommended Content"
 Name: "additional\movies"; Description: "Game Intro"; Flags: disablenouninstallwarning; Types: full
 Name: "additional\hd"; Description: "HD Textures"; Flags: disablenouninstallwarning; Types: full
-Name: "additional\hd\terrain"; Description: "HD Terrain v1.0 (by sleeper)"; Types: full
-Name: "additional\hd\buildings"; Description: "HD Buildings Icons v2.3 (by Fortuking)"; Types: full
-Name: "additional\hd\tech"; Description: "HD Tech Icons v2.1 (by Fortuking)"; Types: full
+Name: "additional\hd\terrain"; Description: "HD Terrain v1.0 (by Sleeper & Yukon)"; Types: full
+
+Name: "additional\hd\buildings"; Description: "HD Buildings Icons (by Fortuking)"; 
+Name: "additional\hd\buildings\noletters"; Description: "HD with no letters v3.0"; Types: full; Flags: exclusive
+Name: "additional\hd\buildings\english_qwerty"; Description: "HD with English (QWERTY) Letters v3.0.2"; Flags: exclusive
+Name: "additional\hd\buildings\french_azerty"; Description: "HD with French (AZERTY) Letters v3.0.2"; Flags: exclusive
+Name: "additional\hd\buildings\german_qwertz"; Description: "HD with German (QWERTZ) Letters v3.0.2"; Flags: exclusive
+
+Name: "additional\hd\buildings"; Description: "HD Tech Icons (by Fortuking)";
+Name: "additional\hd\tech\noletters"; Description: "HD with no letters v3.0.1"; Types: full; Flags: exclusive
+Name: "additional\hd\tech\english_qwerty"; Description: "HD with English (QWERTY) Letters v3.0"; Flags: exclusive
+
 Name: "additional\hd\effects"; Description: "HD Effects WIP (by Fortuking)"; Types: full
 Name: "additional\drexmod"; Description: "dreXmod.dll v2 for better Camera, HUD and Lobby (by Yukon)"; Flags: disablenouninstallwarning; Types: full compact; MinVersion: 0,5.1
 ; Name: "additional\reborn"; Description: "Reborn.dll v0.1 for better Camera, Resolution and Solo Max Units"; Flags: disablenouninstallwarning; Types: full compact; MinVersion: 0,5.1
-Name: "additional\omega"; Description: "Omega Content";
 #if InstallType == "EE"
-  ; no_db allow to keep compatibility with full retail (because any db edit change EE version)
-  Name: "additional\omega\no_db"; Description: "Omega Content for more Maps"; Types: full custom; Flags: exclusive; 
-  Name: "additional\omega\neo"; Description: "Omega Neo Content for more Maps, Max Pop and Starting Resources"; Flags: exclusive;
-#elif InstallType == "NeoEE"
-  Name: "additional\omega\no_db"; Description: "Omega Content for more Maps"; Types: compact full custom; Flags: fixed
-  Name: "additional\omega\neo"; Description: "Omega Neo Content for more Maps, Max Pop and Starting Resources"; Types: compact full custom; Flags: fixed
+  Name: "additional\omega"; Description: "Omega Content for more Maps"; Types: full custom; 
 #endif
 
 Name: "additional\directx_wrapper"; Description: "DirectX Wrapper (+compatibility and sometime +performance)"; Flags: disablenouninstallwarning; MinVersion: 0.0,6.1
@@ -398,6 +413,7 @@ Source: "./data/Add-on/Movies/EE/*"; DestDir: "{app}\Empire Earth\Data\Movies"; 
 
 #if InstallType == "NeoEE"
   Source: "./data/NeoEE Base/Empire Earth/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game
+  Source: "./data/Add-on/Omega/EE/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game
   Source: "./data/NeoEE - Admin/Empire Earth/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game; Check: IsAdminInstallMode
   Source: "./data/NeoEE - User/Empire Earth/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game; Check: not IsAdminInstallMode
   Source: "./data/NeoEE - CDKeys/authtools_user.exe"; DestDir: "{tmp}";  DestName: "authtools.exe"; Flags: deleteafterinstall ignoreversion recursesubdirs createallsubdirs; Components: game; Check: not IsAdminInstallMode
@@ -417,11 +433,11 @@ Source: "{tmp}\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recurs
 ; Also Reborn Dll will soon replace the main functions of drex 2
 ; Yukon s'il te plait, rends ton code public et faisons avancer le communauté tous ensemble, sérieusement ça n'a aucun sens nous somme si peu de dev...
 Source: "./data/Add-on/DLLs/dreXmod/2/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\drexmod and game;  
-; Omega
-Source: "./data/Add-on/Omega/EE/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: (additional\omega\no_db or additional\omega\neo) and game
-; Maybe te delete later, but it add some fun
-Source: "./data/Add-on/Omega_Neo/EE/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\omega\neo and game
 
+#if InstallType == "EE"
+  ; Omega
+  Source: "./data/Add-on/Omega/EE/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\omega and game
+#endif
 ; dgVoodoo  Bin
 Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_bin/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper and game and not additional\directx_wrapper\dx9 
 Source: "./data//Add-on/DirectX_Wrapper/GOG/DDraw.dll"; DestDir: "{app}\Empire Earth"; DestName: "DDraw.dll"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx9 and game;
@@ -445,8 +461,25 @@ Source: "./data/Add-on/DLLs/Discord/*"; DestDir: "{app}\Empire Earth"; Flags: ig
 ; HD
 Source: "./data/Add-on/HD/terrain/*"; DestDir: "{app}\Empire Earth\Data\Textures"; \
   Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\terrain and game
-Source: "./data/Add-on/HD/buildings/*"; DestDir: "{app}\Empire Earth\Data\Textures"; \
+
+; Tech
+Source: "./data/Add-on/HD/tech/Not Localized/*"; DestDir: "{app}\Empire Earth\Data\Textures"; \
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\tech\noletters and game
+Source: "./data/Add-on/HD/tech/English (QWERTY)/*"; DestDir: "{app}\Empire Earth\Data\Textures"; \
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\tech\english_qwerty and game
+
+; Building
+Source: "./data/Add-on/HD/buildings/Other Buildings/*"; DestDir: "{app}\Empire Earth\Data\Textures"; \
   Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\buildings and game
+Source: "./data/Add-on/HD/buildings/Not Localized/*"; DestDir: "{app}\Empire Earth\Data\Textures"; \
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\buildings\noletters and game
+Source: "./data/Add-on/HD/buildings/English (QWERTY)/*"; DestDir: "{app}\Empire Earth\Data\Textures"; \
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\buildings\english_qwerty and game
+Source: "./data/Add-on/HD/buildings/French (AZERTY)/*"; DestDir: "{app}\Empire Earth\Data\Textures"; \
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\buildings\french_azerty and game
+Source: "./data/Add-on/HD/buildings/German (QWERTZ)/*"; DestDir: "{app}\Empire Earth\Data\Textures"; \
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\buildings\german_qwertz and game
+
 Source: "./data/Add-on/HD/effects/*"; DestDir: "{app}\Empire Earth\Data\Textures"; \
   Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\effects and game
 
@@ -461,6 +494,8 @@ Source: "./data/Add-on/Movies/AoC/*"; DestDir: "{app}\Empire Earth - The Art of 
 
 #if InstallType == "NeoEE"
   Source: "./data/NeoEE Base/Empire Earth - The Art of Conquest/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
+    Flags: ignoreversion recursesubdirs createallsubdirs; Components: gameaoc
+  Source: "./data/Add-on/Omega/AoC/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
     Flags: ignoreversion recursesubdirs createallsubdirs; Components: gameaoc
   Source: "./data/NeoEE - Admin/Empire Earth - The Art of Conquest/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
     Flags: ignoreversion recursesubdirs createallsubdirs; Components: gameaoc; Check: IsAdminInstallMode
@@ -486,11 +521,12 @@ Source: "{tmp}\EE\Data\Campaigns\EELearningCampaign.ssa"; DestDir: "{app}\Empire
 ; DreXmod
 Source: "./data/Add-on/DLLs/dreXmod/2/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
   Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\drexmod and gameaoc
-; Omega
-Source: "./data/Add-on/Omega/AoC/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
-  Flags: ignoreversion recursesubdirs createallsubdirs; Components: (additional\omega\no_db or additional\omega\neo) and gameaoc
-Source: "./data/Add-on/Omega_Neo/AoC/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
-  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\omega\neo and gameaoc
+
+#if InstallType == "EE"  
+  ; Omega
+  Source: "./data/Add-on/Omega/AoC/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
+    Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\omega and gameaoc
+#endif
 
 ; dgVoodoo  Bin
 Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_bin/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
@@ -524,8 +560,24 @@ Source: "./data/Add-on/DLLs/Discord/*"; DestDir: "{app}\Empire Earth - The Art o
 ; HD
 Source: "./data/Add-on/HD/terrain/*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Textures"; \
   Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\terrain and gameaoc
-Source: "./data/Add-on/HD/buildings/*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Textures"; \
+
+; Tech
+Source: "./data/Add-on/HD/tech/Not Localized/*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Textures"; \
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\tech\noletters and gameaoc
+Source: "./data/Add-on/HD/tech/English (QWERTY)/*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Textures"; \
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\tech\english_qwerty and gameaoc
+
+; Building
+Source: "./data/Add-on/HD/buildings/Other Buildings/*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Textures"; \
   Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\buildings and gameaoc
+Source: "./data/Add-on/HD/buildings/Not Localized/*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Textures"; \
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\buildings\noletters and gameaoc
+Source: "./data/Add-on/HD/buildings/English (QWERTY)/*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Textures"; \
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\buildings\english_qwerty and gameaoc
+Source: "./data/Add-on/HD/buildings/French (AZERTY)/*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Textures"; \
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\buildings\french_azerty and gameaoc
+Source: "./data/Add-on/HD/buildings/German (QWERTZ)/*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Textures"; \
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\buildings\german_qwertz and gameaoc
 Source: "./data/Add-on/HD/effects/*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Textures"; \
   Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\effects and gameaoc
 
@@ -648,7 +700,7 @@ Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "
   Flags: createvalueifdoesntexist uninsdeletevalue; Check: not IsAdminInstallMode; MinVersion: 0.0,5.0; OnlyBelowVersion: 0.0,6.0; Tasks: not compatibility_windows and compatibility; Components: gameaoc
 
 ; Game Settings
-Root: "HKCU"; Subkey: "{#BaseRegEE}"; Flags: createvalueifdoesntexist uninsdeletekey; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; Flags: uninsdeletekey; Components: game
 Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D Hardware TnL"; Components: game and not additional\directx_wrapper; Check: not IsWine
 Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Components: game and additional\directx_wrapper; Check: not IsWine
 Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Check: IsWine 
@@ -739,9 +791,28 @@ Type: files; Name: "{app}\Empire Earth\dreXmod.config"
 Type: files; Name: "{app}\Empire Earth\dreXmod.dll"
 Type: files; Name: "{app}\Empire Earth\Reborn.ini"
 Type: files; Name: "{app}\Empire Earth\Reborn.dll"
-Type: files; Name: "{app}\Empire Earth\Data\WONLobby Resources\GameOptionsCtrl.cfg"
 Type: files; Name: "{app}\Empire Earth\discord_game_sdk.dll"
 Type: files; Name: "{app}\Empire Earth\EEDiscordRichPresence.dll"
+Type: files; Name: "{app}\Empire Earth\Data\Scenarios\ScenDefault.scn"
+
+
+Type: files; Name: "{app}\Empire Earth\Data\Random Map Scripts\New Plains.rmv"
+Type: files; Name: "{app}\Empire Earth\Data\Random Map Scripts\No Resources.rmv"
+Type: files; Name: "{app}\Empire Earth\Data\Random Map Scripts\Tortured Rivers.rmv"
+Type: files; Name: "{app}\Empire Earth\Data\Random Map Scripts\Tunisia Oasis.rmv"
+Type: files; Name: "{app}\Empire Earth\Data\Random Map Scripts\Tweek My CA Micro.rmv"
+Type: files; Name: "{app}\Empire Earth\Data\Random Map Scripts\Twisted For Grens.rmv"
+Type: files; Name: "{app}\Empire Earth\Data\Random Map Scripts\Uniquely Random.rmv"
+Type: files; Name: "{app}\Empire Earth\Data\Random Map Scripts\Vicious Isthmi.rmv" 
+Type: files; Name: "{app}\Empire Earth\Data\Random Map Scripts\X.rmv"
+Type: files; Name: "{app}\Empire Earth\Data\Random Map Scripts\Z.rmv"
+Type: files; Name: "{app}\Empire Earth\Data\Random Map Scripts\zBG_Death Gulch.rmv"
+Type: files; Name: "{app}\Empire Earth\Data\Random Map Scripts\zContinents-DrOrange.rmv"
+Type: files; Name: "{app}\Empire Earth\Data\Random Map Scripts\zRandom Islands.rmv"
+Type: files; Name: "{app}\Empire Earth\Data\Random Map Scripts\zRandom Land.rmv"
+Type: files; Name: "{app}\Empire Earth\Data\Random Map Scripts\zTropic Island.rmv"
+
+Type: files; Name: "{app}\Empire Earth\OOS *"
 Type: filesandordirs; Name: "{app}\Empire Earth\Data\Movies\";
 Type: filesandordirs; Name: "{app}\Empire Earth\Data\_Movies\" 
 ; ----------------
@@ -756,9 +827,27 @@ Type: files; Name: "{app}\Empire Earth - The Art of Conquest\dreXmod.config"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\dreXmod.dll" 
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Reborn.ini" 
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Reborn.dll"
-Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Data\WONLobby Resources\GameOptionsCtrl.cfg"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\discord_game_sdk.dll"
-Type: files; Name: "{app}\Empire Earth - The Art of Conquest\EEDiscordRichPresence.dll"   
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\EEDiscordRichPresence.dll"
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Data\Scenarios\ScenDefault.scn" 
+
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts\New Plains.rmv"
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts\No Resources.rmv"
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts\Tortured Rivers.rmv"
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts\Tunisia Oasis.rmv"
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts\Tweek My CA Micro.rmv"
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts\Twisted For Grens.rmv"
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts\Uniquely Random.rmv"
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts\Vicious Isthmi.rmv" 
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts\X.rmv"
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts\Z.rmv"
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts\zBG_Death Gulch.rmv"
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts\zContinents-DrOrange.rmv"
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts\zRandom Islands.rmv"
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts\zRandom Land.rmv"
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts\zTropic Island.rmv"
+
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\OOS *"  
 Type: filesandordirs; Name: "{app}\Empire Earth - The Art of Conquest\Data\Movies\"
 Type: filesandordirs; Name: "{app}\Empire Earth - The Art of Conquest\Data\_Movies\"
 
@@ -770,7 +859,8 @@ Type: files; Name: "{app}\Empire Earth\neoee.log"
 Type: files; Name: "{app}\Empire Earth\upnp_info.txt"
 Type: files; Name: "{app}\Empire Earth\Reborn.ini"
 Type: files; Name: "{app}\Empire Earth\_won*"
-Type: files; Name: "{app}\Empire Earth\_wonHTTPCache\*"
+Type: files; Name: "{app}\Empire Earth\_wonHTTPCache\*" 
+Type: files; Name: "{app}\Empire Earth\upnp_info.txt"
 Type: filesandordirs; Name: "{app}\Empire Earth\_wonHTTPCache"
 ; portuguese_brazil create that dir for some reasons (not used)
 Type: filesandordirs; Name: "{app}\Empire Earth\Users\default\Civilizações"
@@ -781,6 +871,7 @@ Type: files; Name: "{app}\Empire Earth - The Art of Conquest\upnp_info.txt"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Reborn.ini"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\_won*"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\_wonHTTPCache\*"
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\upnp_info.txt"
 Type: filesandordirs; Name: "{app}\Empire Earth - The Art of Conquest\_wonHTTPCache" 
 ; portuguese_brazil create that dir for some reasons (not used)
 Type: filesandordirs; Name: "{app}\Empire Earth - The Art of Conquest\Users\default\Civilizações"
@@ -1632,13 +1723,6 @@ end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
-  
-  // Omega Warning after components page
-  if (CurPageID = wpSelectComponents) and (WizardIsComponentSelected('additional\omega\neo')) and (WizardSupressMsgBoxes = False) and (ExpandConstant('{#InstallType}') <> 'NeoEE') then
-  begin
-    MsgBox('Omega *Neo* Content is selected and is going to be installed, please note that players who don''t have it cannot play together !'
-      + #13#10 + 'They will get a game version error message.', mbInformation, MB_OK);
-  end;
   
   // Register files after components page
   if (CurPageID = wpSelectComponents) then
