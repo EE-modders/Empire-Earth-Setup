@@ -11,7 +11,7 @@
 ;                 Credit
 ; ---------------------------------------
 ; Translations :
-;  German   : xXxJannik#0001
+;  German   : xXxJannik#0001, AmbozZ_Ger#3847
 ;  French   : EnergyCube#7471
 ;  Polish   : Dr.MonaLisa#9523
 ;  Italian  : Âgræl#9008
@@ -26,7 +26,7 @@
 ;   Dege (DX Wrapper: dgVoodoo), GOG (DX Wrapper), zocker_160 & EnergyCube (Reborn.dll)
 ; Other Help
 ;   CyrentiX#1219 (Compatibility), xq_happy#7140 (Compatibility & Chinese files)
-;   giord#4697 (Content), IvaN#9233 (Spanish files), FC_Fan#8831 (Russian files)
+;   giord#4697 (Content, Compatibility), IvaN#9233 (Spanish files), FC_Fan#8831 (Russian files)
 ;   Every members of EE:Reborn team and and all others I may have forgotten :>
 ; ---------------------------------------
 ;  Notes  | Empire Earth is very sensitive to version change (which leads to multiplayer incompatibility),
@@ -47,7 +47,7 @@
 ;              Release Note
 ; ---------------------------------------
 ; 1.0.0.0 | Initial Version
-;         |------------------------------
+;         |--------- 16/02/2022 ----------
 ;         | EE & AoC (in 11 languages)    
 ;         | Support NeoEE, dreXmod, Omega content 
 ;         | Support NeoEE CDKey generation (Admin)
@@ -60,7 +60,7 @@
 ;         | DirectX 9 Install (when using DirectX Wrapper for DirectX 9) 
 ;         | Removable Movies
 ;         | Digitally signed
-;         |------------------------------
+;         |-------------------------------
 ;         | DX11 (API 10 & 11) has been disabled. It is obviously impossible to fix the bug related to the
 ;         | full screen of the lobby (which puts the main window in window).
 ;         | Reborn.dll is currently disabled because of a bug that makes it unusable with dgVoodoo (or makes
@@ -68,14 +68,14 @@
 ;         | Since after analysis the binaries of GOG and the one of the 2002 Empire Earth crack are identical
 ;         | the installation mode of the GOG binary has been removed since it is useless (its equivalent is to
 ;         | simply use the DirectX Wrapper of DirectX 9)
-; ---------------------------------------
+; ----------------------------------------
 ; 1.0.0.1 | NeoEE version fix
-;         |------------------------------
+;         |--------- 17/02/2022 ----------
 ;         | Fixed invalid regedit path for NeoEE (Installed From Directory was reversed)
 ;         | Deleted old NeoEE integrated updater
-; ---------------------------------------
+; ----------------------------------------
 ; 1.0.1.0 | NeoEE CDKeys user support, fixed Regedit and added new tool
-;         |------------------------------
+;         |--------- 20/02/2022 ----------
 ;         | Patched authtools.exe to install CDKeys in HKCU (now there is 2 authtools bin)
 ;         | Patched EE & AoC to read CDKeys in HKCU (now there is 2 Neo EE/AoC bin)   
 ;         | Fixed wrong regedit compatibility delete that was deleting the entire (Layers) key  
@@ -84,23 +84,43 @@
 ;         | Better certificate uninstall (check if another game is instaleld)
 ;         | Allow to install the certificate as user
 ;         | Redirected chinese traditional setup messages to chinese
-; ---------------------------------------
+; ----------------------------------------
 ; 1.0.2.0 | NeoEE Map fix, new HD content inc. icons with/witout letters
-;         |------------------------------
+;         |--------- 06/03/2022 ----------
 ;         | Fixed invalid maps on NeoEE
 ;         | Fixed EE:Diagnostic error while EE running
 ;         | Reworked WON Lobby Dialog images
 ;         | Added tips for recommanded multiplayer max pop for NeoEE
-;         | Updated HD Icons by Fortukin
-;         | Added HD Icons with localized letters
-;         | Added some HD terrain textures from Yukon mod
+;         | Updated HD Icons by Fortuking
+;         | Added some HD terrain textures from Yukon mod 
 ;         | Better file clean-up (OOS, UPnP)
 ;         | Reworked Omega content management in the Setup
-; ---------------------------------------
+; ----------------------------------------
+; 1.0.3.0 | eC Civs update, lobby regist. for Gen Z, fixed Linux setup crash, easy install mode and CD Keys/Install repair
+;         |--------- 14/04/2022 ----------  
+;         | Updated eC civs thanks to Kazter
+;         | Added back the NeoEE Updater because it could still be required
+;         | NeoEE registration now allow year up to 3000 (was limited to 1999)
+;         | Fixed NeoEE Admin binary headers
+;         | Added a new page in the setup to install with default options (easy) or custom options
+;         | Added a new page for default options to select GPU vendor to try to apply settings
+;         | Renamed 'Game Intro' to 'Install intro videos' to avoid that people don't understand
+;         | Updated HD Icons by Fortuking
+;         | CD Keys now display an error message when fail
+;         | Installation step has been reworked to use safer IS function instead of the page ID
+;         | Components/Tasks now split the elements rather than stupidly looking for a match in the whole reg list as string 
+;         | Added back dgVoodoo DX 11 config and more stable DX 12 thanks to Giord (also removed useless dgVoodoo dlls files)
+;         | Fixed AoC directory creation when not installing it while using DirectX Wrapper
+;         | Reworked gold corners of IG interface (isn't in HD content, it's by default)
+;         | Removed already installed warning
+;         |------------------------------ 
+;         | I am still shocked by the results of the first round of the presidential
+;         | election of the French Republic, so there can be errors of innatention in the code...
+; ----------------------------------------
 
 ; SETUP SETTINGS
 
-#define MySetupVersion "1.0.2.0"
+#define MySetupVersion "1.0.3.0"
 #define MyAppExeName "Empire Earth.exe"
 #define MyAppGroupName "Empire Earth" 
 
@@ -179,21 +199,24 @@
   # error Unsupported Install Type
 #endif
 
-[Setup]
-; SignTool: We need to use InnoSetup SignTool feature to sign install/uninstall etc...
 ; AppId: Tools > Generate GUID
 ; Be very carefull to AppId, it's like the unique id of the setup, be sure to generate it with inno setup
 ; the first time you distribute your setup and to keep it forever for the setup !
 ; So since it's a unique setup id, EE & NeoEE must have different AppId !
+#define EE_AppID ""
+#define NeoEE_AppID ""
+
+[Setup]
+; SignTool: We need to use InnoSetup SignTool feature to sign install/uninstall etc...
 #if InstallType == "EE"
-  AppId={
+  AppId={{#EE_AppID}
   SetupIconFile=./data/Empire Earth Base/Empire Earth/game.ico
   WizardSmallImageFile=./WizardSmallImageFileEE.bmp
   #if SignSetup
     SignTool=NameInInnoSetupEE $f
   #endif
 #elif InstallType == "NeoEE"
-  AppId={
+  AppId={{#NeoEE_AppID}
   SetupIconFile=./data/NeoEE Base/Empire Earth/neoee.ico
   WizardSmallImageFile=./WizardSmallImageFileNeo.bmp
   #if SignSetup
@@ -237,7 +260,7 @@ WindowShowCaption=False
 UninstallDisplayIcon={uninstallexe}
 DirExistsWarning=no
 
-#ifdef UNICODE
+#if Ver >= EncodeVer(6, 0, 0)
   WizardStyle=modern
 #else
   WizardStyle=classic
@@ -345,7 +368,7 @@ Name: "gameaoc\update"; Description: "**Try** to download {language} voices and 
 ; ------------------
 
 Name: "additional"; Description: "Additional Recommended Content"
-Name: "additional\movies"; Description: "Game Intro"; Flags: disablenouninstallwarning; Types: full
+Name: "additional\movies"; Description: "Install intro videos"; Flags: disablenouninstallwarning;
 Name: "additional\hd"; Description: "HD Textures"; Flags: disablenouninstallwarning; Types: full
 Name: "additional\hd\terrain"; Description: "HD Terrain v1.0 (by Sleeper & Yukon)"; Types: full
 
@@ -357,7 +380,8 @@ Name: "additional\hd\buildings\german_qwertz"; Description: "HD with German (QWE
 
 Name: "additional\hd\buildings"; Description: "HD Tech Icons (by Fortuking)";
 Name: "additional\hd\tech\noletters"; Description: "HD with no letters v3.0.1"; Types: full; Flags: exclusive
-Name: "additional\hd\tech\english_qwerty"; Description: "HD with English (QWERTY) Letters v3.0"; Flags: exclusive
+Name: "additional\hd\tech\english_qwerty"; Description: "HD with English (QWERTY) Letters v3.0.1"; Flags: exclusive
+Name: "additional\hd\tech\french_azerty"; Description: "HD with French (AZERTY) Letters v3.0.1"; Flags: exclusive
 
 Name: "additional\hd\effects"; Description: "HD Effects WIP (by Fortuking)"; Types: full
 Name: "additional\drexmod"; Description: "dreXmod.dll v2 for better Camera, HUD and Lobby (by Yukon)"; Flags: disablenouninstallwarning; Types: full compact; MinVersion: 0,5.1
@@ -368,8 +392,8 @@ Name: "additional\drexmod"; Description: "dreXmod.dll v2 for better Camera, HUD 
 
 Name: "additional\directx_wrapper"; Description: "DirectX Wrapper (+compatibility and sometime +performance)"; Flags: disablenouninstallwarning; MinVersion: 0.0,6.1
 Name: "additional\directx_wrapper\dx9"; Description: "DirectX 9 (Windows XP&+) [Generally Recommended]"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
-; Name: "additional\directx_wrapper\dx11_lvl10"; Description: "DirectX 11 API lvl.10 v2.71.3 (Windows 7&+)"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
-; Name: "additional\directx_wrapper\dx11_lvl11"; Description: "DirectX 11 API lvl.11 v2.71.3 (Windows 7&+)"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
+Name: "additional\directx_wrapper\dx11_lvl10"; Description: "DirectX 11 API lvl.10 v2.71.3 (Windows 7&+)"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
+Name: "additional\directx_wrapper\dx11_lvl11"; Description: "DirectX 11 API lvl.11 v2.71.3 (Windows 7&+)"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
 Name: "additional\directx_wrapper\dx12_lvl11"; Description: "DirectX 12 API lvl.11 v2.71.3 (Windows 10&+)"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,10;
 Name: "additional\directx_wrapper\dx12_lvl12"; Description: "DirectX 12 API lvl.12 v2.71.3 (Windows 10&+)"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,10;
 
@@ -429,9 +453,6 @@ Source: "{app}\Empire Earth\Data\Languages\{language}\*"; DestDir: "{app}\Empire
 Source: "{tmp}\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs external skipifsourcedoesntexist; Components: game\update;
 
 ; DreXmod
-; Soon deprecated by drex 3 that will most probably not included in the setup because it could split community
-; Also Reborn Dll will soon replace the main functions of drex 2
-; Yukon s'il te plait, rends ton code public et faisons avancer le communauté tous ensemble, sérieusement ça n'a aucun sens nous somme si peu de dev...
 Source: "./data/Add-on/DLLs/dreXmod/2/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\drexmod and game;  
 
 #if InstallType == "EE"
@@ -442,8 +463,8 @@ Source: "./data/Add-on/DLLs/dreXmod/2/*"; DestDir: "{app}\Empire Earth"; Flags: 
 Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_bin/*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper and game and not additional\directx_wrapper\dx9 
 Source: "./data//Add-on/DirectX_Wrapper/GOG/DDraw.dll"; DestDir: "{app}\Empire Earth"; DestName: "DDraw.dll"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx9 and game;
 ; dgVoodoo Conf
-; Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX11_LVL10.conf"; DestDir: "{app}\Empire Earth"; DestName: "dgVoodoo.conf"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx11_lvl10 and game;
-; Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX11_LVL11.conf"; DestDir: "{app}\Empire Earth"; DestName: "dgVoodoo.conf"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx11_lvl11 and game;
+Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX11_LVL10.conf"; DestDir: "{app}\Empire Earth"; DestName: "dgVoodoo.conf"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx11_lvl10 and game;
+Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX11_LVL11.conf"; DestDir: "{app}\Empire Earth"; DestName: "dgVoodoo.conf"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx11_lvl11 and game;
 Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX12_LVL11.conf"; DestDir: "{app}\Empire Earth"; DestName: "dgVoodoo.conf"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx12_lvl11 and game;
 Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX12_LVL12.conf"; DestDir: "{app}\Empire Earth"; DestName: "dgVoodoo.conf"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx12_lvl12 and game; 
 
@@ -466,7 +487,9 @@ Source: "./data/Add-on/HD/terrain/*"; DestDir: "{app}\Empire Earth\Data\Textures
 Source: "./data/Add-on/HD/tech/Not Localized/*"; DestDir: "{app}\Empire Earth\Data\Textures"; \
   Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\tech\noletters and game
 Source: "./data/Add-on/HD/tech/English (QWERTY)/*"; DestDir: "{app}\Empire Earth\Data\Textures"; \
-  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\tech\english_qwerty and game
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\tech\english_qwerty and game 
+Source: "./data/Add-on/HD/tech/French (AZERTY)/*"; DestDir: "{app}\Empire Earth\Data\Textures"; \
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\tech\french_azerty and game
 
 ; Building
 Source: "./data/Add-on/HD/buildings/Other Buildings/*"; DestDir: "{app}\Empire Earth\Data\Textures"; \
@@ -530,18 +553,18 @@ Source: "./data/Add-on/DLLs/dreXmod/2/*"; DestDir: "{app}\Empire Earth - The Art
 
 ; dgVoodoo  Bin
 Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_bin/*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
-  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper and game and not additional\directx_wrapper\dx9 
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper and gameaoc and not additional\directx_wrapper\dx9 
 Source: "./data//Add-on/DirectX_Wrapper/GOG/DDraw.dll"; DestDir: "{app}\Empire Earth - The Art of Conquest"; DestName: "DDraw.dll"; \
-  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx9 and game;
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx9 and gameaoc;
 ; dgVoodoo Conf
-; Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX11_LVL10.conf"; DestDir: "{app}\Empire Earth - The Art of Conquest"; DestName: "dgVoodoo.conf"; \
-  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx11_lvl10 and game;
-; Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX11_LVL11.conf"; DestDir: "{app}\Empire Earth - The Art of Conquest"; DestName: "dgVoodoo.conf"; \
-  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx11_lvl11 and game;
+Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX11_LVL10.conf"; DestDir: "{app}\Empire Earth - The Art of Conquest"; DestName: "dgVoodoo.conf"; \
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx11_lvl10 and gameaoc;
+Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX11_LVL11.conf"; DestDir: "{app}\Empire Earth - The Art of Conquest"; DestName: "dgVoodoo.conf"; \
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx11_lvl11 and gameaoc;
 Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX12_LVL11.conf"; DestDir: "{app}\Empire Earth - The Art of Conquest"; DestName: "dgVoodoo.conf"; \
-  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx12_lvl11 and game;
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx12_lvl11 and gameaoc;
 Source: "./data/Add-on/DirectX_Wrapper/dgVoodoo_conf/dgVoodoo_DX12_LVL12.conf"; DestDir: "{app}\Empire Earth - The Art of Conquest"; DestName: "dgVoodoo.conf"; \
-  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx12_lvl12 and game; 
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx12_lvl12 and gameaoc; 
 
 ; Civs
 Source: "./data/Add-on/Civs/eC/*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Users\default\Civilizations"; \
@@ -566,6 +589,8 @@ Source: "./data/Add-on/HD/tech/Not Localized/*"; DestDir: "{app}\Empire Earth - 
   Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\tech\noletters and gameaoc
 Source: "./data/Add-on/HD/tech/English (QWERTY)/*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Textures"; \
   Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\tech\english_qwerty and gameaoc
+Source: "./data/Add-on/HD/tech/French (AZERTY)/*"; DestDir: "{app}\Empire Earth\Data\Textures"; \
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\hd\tech\french_azerty and gameaoc
 
 ; Building
 Source: "./data/Add-on/HD/buildings/Other Buildings/*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Textures"; \
@@ -847,7 +872,7 @@ Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scr
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts\zRandom Land.rmv"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts\zTropic Island.rmv"
 
-Type: files; Name: "{app}\Empire Earth - The Art of Conquest\OOS *"  
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\OOS *" 
 Type: filesandordirs; Name: "{app}\Empire Earth - The Art of Conquest\Data\Movies\"
 Type: filesandordirs; Name: "{app}\Empire Earth - The Art of Conquest\Data\_Movies\"
 
@@ -992,48 +1017,6 @@ chinese_traditional.SetupUpdate=安装程序不是最新的（{#MySetupVersion} 
 %n%n你想下载最新的版本吗？
 korean.SetupUpdate=설치 프로그램은 최신 ({#MySetupVersion} => [LAST]) 최신 버전의 혜택을 누리는 것이 좋습니다. \
 %n%n최신 버전을 다운로드하시겠습니까?
-  
-; AlreadyInstalled
-AlreadyInstalled=It seems that {#MyAppName} has already been installed. \
-%nIt is recommended that you uninstall and install. \
-%nGame saves are KEPT when uninstalling.  \
-%n%nDo you want to continue the installation?
-french.AlreadyInstalled=Il semble que {#MyAppName} ait déjà été installé. \
-%nIl est recommandé de désinstaller et d'installer. \
-%nLes sauvegardes de jeu sont CONSERVÉES lors de la désinstallation.  \
-%n%nVoulez-vous continuer l'installation ?
-german.AlreadyInstalled=Es scheint, dass {#MyAppName} bereits installiert wurde. \
-%nEs wird empfohlen, dass Sie deinstallieren und neuinstallieren. \
-%nSpielstände werden bei der Deinstallation BEHALTEN.  \
-%n%nWollen Sie die Installation fortsetzen?
-italian.AlreadyInstalled=Sembra che {#MyAppName} sia già stato installato. \
-%nSi raccomanda di disinstallare e installare. \
-%nI salvataggi di gioco vengono CONSERVATI quando si disinstalla.  \
-%n%nVuoi continuare l'installazione?
-spanish.AlreadyInstalled=Parece que {#MyAppName} ya ha sido instalado. \
-%nSe recomienda desinstalar e instalar. \
-%nLas partidas guardadas se CONSERVAN al desinstalar.  \
-%n%n¿Desea continuar con la instalación?
-russian.AlreadyInstalled=Кажется, что приложение {#MyAppName} уже установлено. \
-%nРекомендуется удалить и переустановить. \
-%nСохранения игры НЕ БУДУТ УДАЛЕНЫ при деинсталляции.  \
-%n%nВы хотите продолжить установку?
-polish.AlreadyInstalled=Wygląda na to, że {#MyAppName} został już zainstalowany. \
-%nZalecane jest ręczne odinstalowanie i ponowne uruchomienie programu instalacyjnego. \
-%nPodczas odinstalowywania zapisy gry zostają ZACHOWANE. \
-%n%nCzy mimo to, chcesz kontynuować instalację?
-chinese.AlreadyInstalled=似乎{#MyAppName}已经被安装了。 \
-建议您卸载并安装。 \
-%n当卸载时，游戏保存被保留。 \
-%n%n你想继续安装吗？
-chinese_traditional.AlreadyInstalled=似乎{#MyAppName}已经被安装了。 \
-建议您卸载并安装。 \
-%n当卸载时，游戏保存被保留。 \
-%n%n你想继续安装吗？
-korean.AlreadyInstalled={#MyAppName}가 이미 설치된 것 같습니다. \
-%n제거 하 고 설치 하는 것이 좋습니다. \
-%n게임 저장은 제거 할 때 유지됩니다. \
-%n%n설치를 계속하시겠습니까?
  
 UserInstallMode=You are using the user mode installation, which means that you will not need administrator rights for the installation. \
 %nPlease note that this mode is not able to register the game with the computer's firewall, which may prevent you from hosting games (but you should still be able to join games). \
@@ -1070,7 +1053,185 @@ korean.UserInstallMode=사용자 모드 설치를 사용하고 있으므로 설�
 ; Since our custom button isn't auto scaled to content
 ; better keep Mute / Unmute, tiny and everyone should understand 
 SoundCtrlButtonCaptionSoundOn=Unmute 
-SoundCtrlButtonCaptionSoundOff=Mute 
+SoundCtrlButtonCaptionSoundOff=Mute
+
+// Setup Custom Page
+// Manual / Custom install page
+MIQP_Title=Select the desired installation mode
+french.MIQP_Title=Sélectionnez le mode d'installation souhaité
+german.MIQP_Title=Wählen Sie den gewünschten Installationsmodus
+italian.MIQP_Title=Selezionare la modalità di installazione desiderata
+spanish.MIQP_Title=Seleccione el modo de instalación deseado
+russian.MIQP_Title=Выберите нужный режим установки
+polish.MIQP_Title=Wybierz pożądany tryb instalacji
+chinese.MIQP_Title=选择所需的安装模式
+chinese_traditional.MIQP_Title=选择所需的安装模式
+korean.MIQP_Title=원하는 설치 모드를 선택하십시오.
+
+MIQP_Desc=Do you want to use the default or your own install settings?
+french.MIQP_Desc=Voulez-vous utiliser les paramètres par défaut ou vos propres paramètres d'installation ?
+german.MIQP_Desc=Möchten Sie die Standardeinstellungen oder Ihre eigenen Installationseinstellungen verwenden?
+italian.MIQP_Desc=Vuoi usare le impostazioni di default o le tue impostazioni di installazione?
+spanish.MIQP_Desc=¿Quiere usar la instalación predeterminada o personalizada?
+russian.MIQP_Desc=Вы хотите использовать настройки по умолчанию или собственные настройки установки?
+polish.MIQP_Desc==Czy chcesz użyć domyślnych opcji instalacji, czy wybrać własne?
+chinese.MIQP_Desc=你想使用默认的还是你自己的安装设置？
+chinese_traditional.MIQP_Desc=你想使用默认的还是你自己的安装设置？
+korean.MIQP_Desc=기본 또는 자체 설치 설정을 사용하시겠습니까?
+
+MIQP_Content=Choose whether you prefer to use the default settings or use more advanced settings that you select manually from those offered in the installer.
+french.MIQP_Content=Choisissez si vous préférez utiliser les paramètres par défaut ou des paramètres plus avancés que vous sélectionnez manuellement parmi ceux proposés dans le programme d'installation.
+german.MIQP_Content=Wählen Sie aus, ob Sie die Standardeinstellungen oder die erweiterten Einstellungen verwenden möchten, welche Sie manuell aus dem Angebot des Installationsassistenten selektieren müssen.
+italian.MIQP_Content=Scegliete se preferite usare le impostazioni predefinite o usare impostazioni più avanzate che selezionate manualmente tra quelle offerte nel programma di installazione.
+spanish.MIQP_Content=Elija si prefiere usar las opciones predeterminadas o las opciones más avanzadas donde podrá seleccionar manualmente de entre las ofrecidas por el instalador.
+russian.MIQP_Content=Выберите, хотите ли вы использовать настройки по умолчанию или использовать более продвинутые настройки, которые вы выбираете вручную из предложенных в программе установки.
+polish.MIQP_Content=Wybierz czy preferujesz użycie domyślnych opcji instalacji, czy bardziej zaawansowanych, które pozwolą ręcznie wybrać komponenty.
+chinese.MIQP_Content=选择你是喜欢使用默认设置，还是使用你从安装程序提供的设置中手动选择的更高级设置。
+chinese_traditional.MIQP_Content=选择你是喜欢使用默认设置，还是使用你从安装程序提供的设置中手动选择的更高级设置。
+korean.MIQP_Content=기본 설정을 사용할지 또는 설치 관리자에서 제공하는 설정 중에서 수동으로 선택하는 고급 설정을 사용할지 선택합니다.
+
+MIQP_Recommanded=Recommanded settings
+french.MIQP_Recommanded=Paramètres recommandés
+german.MIQP_Recommanded=Empfohlene Einstellungen
+italian.MIQP_Recommanded=Impostazioni raccomandate
+spanish.MIQP_Recommanded=Opciones recomendadas
+russian.MIQP_Recommanded=Рекомендуемые настройки
+polish.MIQP_Recommanded=Zalecane ustawienia
+chinese.MIQP_Recommanded=建议的设置
+chinese_traditional.MIQP_Recommanded=建议的设置
+korean.MIQP_Recommanded=명령된 설정
+
+MIQP_Recommanded_EE=Install Empire Earth
+french.MIQP_Recommanded_EE=Installer Empire Earth
+german.MIQP_Recommanded_EE=Installiere Empire Earth
+italian.MIQP_Recommanded_EE=Installare Empire Earth
+spanish.MIQP_Recommanded_EE=Instalar Empire Earth
+russian.MIQP_Recommanded_EE=Установите Empire Earth
+polish.MIQP_Recommanded_EE=Zainstaluj Empire Earth
+chinese.MIQP_Recommanded_EE=安装 Empire Earth
+chinese_traditional.MIQP_Recommanded_EE=安装 Empire Earth
+korean.MIQP_Recommanded_EE=Empire Earth 설치
+
+MIQP_Recommanded_EE_AoC=Install Empire Earth and The Art of Conquest Expansion
+french.MIQP_Recommanded_EE_AoC=Installer Empire Earth et l'extension The Art of Conquest
+german.MIQP_Recommanded_EE_AoC=Installiere Empire Earth und Die Kunst der Eroberungen - Erweiterung
+italian.MIQP_Recommanded_EE_AoC=Installare Empire Earth e The Art of Conquest Expansion
+spanish.MIQP_Recommanded_EE_AoC=Instalar Empire Earth y la expansión The Art of Conquest
+russian.MIQP_Recommanded_EE_AoC=Установите Empire Earth и расширение The Art of Conquest
+polish.MIQP_Recommanded_EE_AoC=Zainstaluj Empire Earth wraz z dodatkiem The Art of Conquest
+chinese.MIQP_Recommanded_EE_AoC=安装 Empire Earth 和 The Art of Conquest 扩展版
+chinese_traditional.MIQP_Recommanded_EE_AoC=安装 Empire Earth 和 The Art of Conquest 扩展版
+korean.MIQP_Recommanded_EE_AoC=Empire Earth 와 The Art of Conquest 확장 설치
+
+MIQP_Custom=Custom install settings
+french.MIQP_Custom=Paramètres d'installation personnalisés
+german.MIQP_Custom=Benutzerdefinierte Installationseinstellungen
+italian.MIQP_Custom=Impostazioni di installazione personalizzate
+spanish.MIQP_Custom=Opciones personalizadas de instalación
+russian.MIQP_Custom=Пользовательские настройки установки
+polish.MIQP_Custom=Ręczne ustawienia instalacji
+chinese.MIQP_Custom=自定义安装设置
+chinese_traditional.MIQP_Custom=自定义安装设置
+korean.MIQP_Custom=사용자 지정 설치 설정
+
+MIQP_Repair=Repair current installation
+french.MIQP_Repair=Réparer l'installation actuelle
+german.MIQP_Repair=Vorhandene Installation reparieren
+italian.MIQP_Repair=Riparare l'installazione corrente
+spanish.MIQP_Repair=Reparar instalación actual
+russian.MIQP_Repair=Ремонт текущей установки
+polish.MIQP_Repair=Napraw istniejącą instalację
+chinese.MIQP_Repair=修复当前的安装
+chinese_traditional.MIQP_Repair=修复当前的安装
+korean.MIQP_Repair=현재 설치 복구
+
+// GPU vendor install page
+GPUIQP_Title=Select your graphics card (GPU) brand
+french.GPUIQP_Title=Sélectionnez la marque de votre carte graphique (GPU)
+german.GPUIQP_Title=Wählen Sie Ihren Grafikkartenhersteller aus
+italian.GPUIQP_Title=Seleziona la marca della tua scheda grafica (GPU)
+spanish.GPUIQP_Title=Seleccione la marca de su tarjeta de video (GPU)
+russian.GPUIQP_Title=Выберите марку вашей видеокарты (GPU)
+polish.GPUIQP_Title=Wybierz producenta swojej karty graficznej (GPU)
+chinese.GPUIQP_Title=选择你的显卡（GPU）品牌
+chinese_traditional.GPUIQP_Title=选择你的显卡（GPU）品牌
+korean.GPUIQP_Title=그래픽 카드(GPU) 브랜드 선택
+
+GPUIQP_Desc=In this step the setup will try to apply parameters for your graphics card.
+french.GPUIQP_Desc=De cette façon, l'installation essaiera d'appliquer des paramètres pour votre carte graphique.
+german.GPUIQP_Desc=Auf diese Art und Weise wird der Installationsassistent versuchen, geeignete Kompatibilitätseinstellungen für Ihre Grafikkarte zu übernehmen.
+italian.GPUIQP_Desc=In questo modo il setup cercherà di applicare i parametri per la vostra scheda grafica.
+spanish.GPUIQP_Desc=De esta manera el instalador intentará aplicar los parámetros que se ajusten a su tarjeta de video.
+russian.GPUIQP_Desc=Таким образом, установка попытается применить параметры для вашей видеокарты.
+polish.GPUIQP_Desc=Na tym etapie, program instalacyjny spróbuje zastosować parametry dla Twojej karty graficznej.
+chinese.GPUIQP_Desc=通过这种方式，设置将尝试应用你的显卡参数。
+chinese_traditional.GPUIQP_Desc=通过这种方式，设置将尝试应用你的显卡参数。
+korean.GPUIQP_Desc=이런 식으로 설치 프로그램은 그래픽 카드에 매개 변수를 적용하려고합니다.
+
+GPUIQP_Content=Choose the brand of the main graphics card for this computer. This way the installer will try to apply the compatibility settings for it. \
+%nIf this is not your first installation and the previous one did not work, you can try the other modes even if they do not match your graphics card brand or perform a manual installation to get access to all installation settings.
+french.GPUIQP_Content=Choisissez la marque de la carte graphique principale de cet ordinateur, de cette façon, le programme d'installation essaiera d'appliquer les paramètres de compatibilité pour celle-ci. \
+%nSi ce n'est pas votre première installation et que la précédente n'a pas fonctionné, vous pouvez essayer les autres modes même s'ils ne correspondent pas à la marque de votre carte graphique ou effectuer une installation manuelle pour avoir accès à tous les paramètres d'installation.
+german.GPUIQP_Content=Wählen Sie den Hersteller Ihrer primären Grafikkarte für diesen Computer aus. Der Installationsassistent wird versuchen, geeignete Kompatibilitätseinstellungen zu übernehmen. \
+%nSollte dies nicht Ihre erste Installation sein und die vorherige nicht erfolgreich war, können Sie die anderen Installationsmodi ausprobieren, selbst wenn diese nicht mit Ihrem Grafikkartenhersteller übereinstimmen. Sie können ebenfalls eine manuelle Installation durchführen, um Zugriff auf alle Installationseinstellungen zu erhalten.
+italian.GPUIQP_Content=Scegliete la marca della scheda grafica principale di questo computer. In questo modo il programma di installazione cercherà di applicare le impostazioni di compatibilità per essa. \
+%nSe questa non è la tua prima installazione e la precedente non ha funzionato, puoi provare le altre modalità anche se non corrispondono alla marca della tua scheda grafica o eseguire un'installazione manuale per avere accesso a tutte le impostazioni di installazione.
+spanish.GPUIQP_Content=Seleccione la marca de la tarjeta de video principal de este computador. De esta forma el instalador intentará aplicar las opciones de compatibilidad correctas. \
+%nSi ésta no es su primera instalación y la anterior no funcionó, puede intentar los otros modos incluso si no coinciden con la marca de su tarjeta de video o intentar una instalación manual para obtener acceso a todas las opciones de instalación.
+russian.GPUIQP_Content=Выберите марку основной видеокарты для этого компьютера. Таким образом, программа установки попытается применить настройки совместимости для нее. \
+%nЕсли это не первая установка и предыдущая не сработала, вы можете попробовать другие режимы, даже если они не соответствуют марке вашей видеокарты, или выполнить ручную установку, чтобы получить доступ ко всем настройкам установки.
+polish.GPUIQP_Content==Wybierz producenta Twojej głównej karty graficznej zainstalowanej w komputerze. Na tym etapie, instalator spróbuje zastosować dla niej opcje kompatybilności. \
+%nJeśli nie jest to Twoja pierwsza próba instalacji, a poprzednie nie powiodły się - możesz spróbować innych trybów, nawet jeśli nie są bezpośrednio przeznaczone dla modelu Twojej karty graficznej. Możesz również przeprowadzić ręczny tryb instalacji, dający możliwość wyboru wszystkich zaawansowanych ustawień samodzielnie.
+chinese.GPUIQP_Content=选择这台电脑的主显卡的品牌。这样，安装程序将尝试为其应用兼容性设置。 \
+%n如果这不是你的第一次安装，而且之前的安装没有成功，你可以尝试其他模式，即使它们与你的显卡品牌不匹配，或者执行手动安装以获得所有安装设置。
+chinese_traditional.GPUIQP_Content=选择这台电脑的主显卡的品牌。这样，安装程序将尝试为其应用兼容性设置。 \
+%n如果这不是你的第一次安装，而且之前的安装没有成功，你可以尝试其他模式，即使它们与你的显卡品牌不匹配，或者执行手动安装以获得所有安装设置。
+korean.GPUIQP_Content=이 컴퓨터의 기본 그래픽 카드 브랜드를 선택합니다. 이렇게하면 설치 관리자가 호환성 설정을 적용하려고합니다. \
+%n첫 번째 설치가 아니고 이전 모드가 작동하지 않는 경우 그래픽 카드 브랜드와 일치하지 않더라도 다른 모드를 시도하거나 수동 설치를 수행하여 모든 설치 설정에 액세스할 수 있습니다.
+
+GPUIQP_NVIDIA=NVIDIA
+french.GPUIQP_NVIDIA=NVIDIA
+german.GPUIQP_NVIDIA=NVIDIA
+italian.GPUIQP_NVIDIA=NVIDIA
+spanish.GPUIQP_NVIDIA=NVIDIA
+russian.GPUIQP_NVIDIA=NVIDIA
+polish.GPUIQP_NVIDIA=NVIDIA
+chinese.GPUIQP_NVIDIA=NVIDIA
+chinese_traditional.GPUIQP_NVIDIA=NVIDIA
+korean.GPUIQP_NVIDIA=NVIDIA
+
+GPUIQP_AMD=AMD
+french.GPUIQP_AMD=AMD
+german.GPUIQP_AMD=AMD
+italian.GPUIQP_AMD=AMD
+spanish.GPUIQP_AMD=AMD
+russian.GPUIQP_AMD=AMD
+polish.MIQP_Content=AMD
+chinese.GPUIQP_AMD=AMD
+chinese_traditional.GPUIQP_AMD=AMD
+korean.GPUIQP_AMD=AMD
+
+GPUIQP_Intel=Intel HD Series
+french.GPUIQP_Intel=Intel HD Series
+german.GPUIQP_Intel=Intel HD Series
+italian.GPUIQP_Intel=Intel HD Series
+spanish.GPUIQP_Intel=Intel HD Series
+russian.GPUIQP_Intel=Intel HD Series
+polish.GPUIQP_Intel=Intel HD Series
+chinese.GPUIQP_Intel=Intel HD Series
+chinese_traditional.GPUIQP_Intel=Intel HD Series
+korean.GPUIQP_Intel=Intel HD Series
+
+GPUIQP_Default=I don't know
+french.GPUIQP_Default=Je ne sais pas
+german.GPUIQP_Default=Ich weiß es nicht
+italian.GPUIQP_Default=Non so
+spanish.GPUIQP_Default=No lo sé
+russian.GPUIQP_Default=Я не знаю.
+polish.GPUIQP_Default=Nie wiem
+chinese.GPUIQP_Default=我不知道
+chinese_traditional.GPUIQP_Default=我不知道
+korean.GPUIQP_Default=몰라요 
 
 [Messages]
 ; Remplacing InnoSetup Password Label when using password for encryption
@@ -1095,6 +1256,7 @@ chinese_traditional.IncorrectPassword=你输入的密码不正确。请输入'{#
 korean.PasswordLabel3='{#MySetupPassword}'(사례 에 민감한)를 작성한 다음 다음을 클릭하여 계속하십시오.
 korean.IncorrectPassword=입력한 암호가 올바르지 않습니다. '{#MySetupPassword}'(사례 에 민감한)를 입력하십시오.
 ; BeveledLabel=Little message at the bottom of the setup in case we want but it's ugly
+; For later ? Additional help in cmd: HelpTextNote=/PORTABLE=1%nEnable portable mode.
 
 [Run]
 ; Add Cert in Windows Trusted Root CA Store
@@ -1169,13 +1331,12 @@ Filename: "{tmp}\DirectX_9\DXSETUP.exe"; Parameters: "/silent"; Flags: runhidden
     StatusMsg: "Installing DirectX 9..."; MinVersion: 0,5.0; Components: additional\directx_wrapper\dx9; Check: IsAdminInstallMode
 
 #if InstallType == "NeoEE"
-  // NeoEE CDKeys Regedit Hell
-  // HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Sierra\CDKeys
-  // HKEY_LOCAL_MACHINE\Software\Sierra\CDKeys
-  Filename: "{tmp}\authtools.exe"; Parameters: "-eec={app}\Empire Earth, -authserv=neoee.net, -port=10003"; Flags: runhidden; \
-    StatusMsg: "Register Empire Earth NeoEE CDKey"; MinVersion: 0,5.0; Tasks: neoee_cdkeys; Components: game and not gameaoc;
-  Filename: "{tmp}\authtools.exe"; Parameters: "-eec={app}\Empire Earth, -aoc={app}\Empire Earth - The Art of Conquest, -authserv=neoee.net, -port=10003"; Flags: runhidden; \
-    StatusMsg: "Register Empire Earth Neo EE & AoC CDKey"; MinVersion: 0,5.0; Tasks: neoee_cdkeys; Components: game and gameaoc;
+  // Fake NeoEE register to show the right message while Code will install keys :)
+  // /!\ This mean that this part should always be at the end of Run.
+  Filename: "{sys}\cmd.exe"; Parameters: "/C"; Flags: runhidden; \
+    StatusMsg: "Register Empire Earth NeoEE CDKey"; MinVersion: 0,5.0; Tasks: neoee_cdkeys; Components: game and not gameaoc; AfterInstall: RegisterCDKeys
+  Filename: "{sys}\cmd.exe"; Parameters: "/C"; Flags: runhidden; \
+    StatusMsg: "Register Empire Earth Neo EE & AoC CDKey"; MinVersion: 0,5.0; Tasks: neoee_cdkeys; Components: game and gameaoc; AfterInstall: RegisterCDKeys
 #endif
 
 [UninstallRun]
@@ -1272,6 +1433,68 @@ type
     crEquals,
     crGreater
   );
+
+var
+  ManualInstallQuestionPage: TInputOptionWizardPage;
+  GPUInstallQuestionPage: TInputOptionWizardPage;
+
+// Yeah... Too much complex to be by default in IS Pascal I guess...
+function StrSplit(Text: String; Separator: String): TArrayOfString;
+var
+  i, p: Integer;
+  Dest: TArrayOfString; 
+begin
+  i := 0;
+  repeat
+    SetArrayLength(Dest, i+1);
+    p := Pos(Separator,Text);
+    if p > 0 then begin
+      Dest[i] := Copy(Text, 1, p-1);
+      Text := Copy(Text, p + Length(Separator), Length(Text));
+      i := i + 1;
+    end else begin
+      Dest[i] := Text;
+      Text := '';
+    end;
+  until Length(Text)=0;
+  Result := Dest
+end;
+
+function IsAnotherGameInstalled(): Boolean;
+begin
+  Result := False;
+  #if InstallType == "EE"
+    if RegValueExists(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#NeoEE_AppID}_is1', 'UninstallString')
+    or RegValueExists(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#NeoEE_AppID}_is1', 'UninstallString')
+    then begin
+      Result := True;
+    end;
+  #elif InstallType == "NeoEE"
+    if RegValueExists(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#EE_AppID}_is1', 'UninstallString')
+    or RegValueExists(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#EE_AppID}_is1', 'UninstallString')
+    then begin
+      Result := True;
+    end;
+  #endif
+end;
+
+function IsGameInstalled(): Boolean;
+begin
+  Result := False;
+  #if InstallType == "EE"
+    if RegValueExists(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#EE_AppID}_is1', 'UninstallString')
+    or RegValueExists(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#EE_AppID}_is1', 'UninstallString')
+    then begin
+      Result := True;
+    end;
+  #elif InstallType == "NeoEE"
+    if RegValueExists(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#NeoEE_AppID}_is1', 'UninstallString')
+    or RegValueExists(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#NeoEE_AppID}_is1', 'UninstallString')
+    then begin
+      Result := True;
+    end;
+  #endif
+end;
 
 function Max(A, B: Integer): Integer;
 begin
@@ -1410,10 +1633,10 @@ function IsWine(): Boolean;
 begin
   Result := False;
   if FileExists(GetEnv('winsysdir') + '\winecfg.exe') then
-    Result := True;
-  if RegKeyExists(HKEY_CURRENT_USER, 'Software\Wine') then   
-    Result := True;
-  if RegKeyExists(HKEY_LOCAL_MACHINE, 'Software\Wine') then   
+    Result := True
+  else if RegKeyExists(HKEY_CURRENT_USER, 'Software\Wine') then   
+    Result := True
+  else if RegKeyExists(HKEY_LOCAL_MACHINE, 'Software\Wine') then   
     Result := True; 
 end;
 
@@ -1501,36 +1724,19 @@ begin
 
   try
     if (WizardSupressMsgBoxes = False) then
+    begin
       if (CheckUpdate()) then
         Exit;
+    end
+    else begin
+      Log('Update check skipped because using silent mode');
+    end;
   except
-    MsgBox('Unnable to check update!', mbError, MB_OK);
+    MsgBox('Unable to check update!', mbError, MB_OK);
   end;
   
   // Already Installed
-  if (WizardSupressMsgBoxes = False) and
-    #if InstallType == "EE"
-      // EE
-      ( RegValueExists(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{4C0B46D8-E7EB-4B95-97D4-A578D9B914C6}_is1', 'UninstallString')
-      or
-        RegValueExists(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{4C0B46D8-E7EB-4B95-97D4-A578D9B914C6}_is1', 'UninstallString')
-      or 
-        // Retail EE InstallShield Setup
-        RegValueExists(HKEY_CURRENT_USER, 'SOFTWARE\WOW6432Node\Sierra OnLine\Setup\EEARTH', 'Directory'))      
-    #elif InstallType == "NeoEE"
-      // NeoEE
-      (RegValueExists(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{A24FCC7A-5491-4FEA-837B-4E4430C349DA}_is1', 'UninstallString')
-      or
-       RegValueExists(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{A24FCC7A-5491-4FEA-837B-4E4430C349DA}_is1', 'UninstallString'))
-    #endif
-    then
-    begin
-      if MsgBox(ExpandConstant('{cm:AlreadyInstalled}'), mbInformation, MB_YESNO) = IDNO then
-      begin
-        Exit;
-      end;
-    end
-  else if (WizardSupressMsgBoxes = False) then
+  if (not IsGameInstalled() and not WizardSupressMsgBoxes) then
   begin
     // Legal Question
     if MsgBox(ExpandConstant('{cm:LegalQuestion}'), mbConfirmation, MB_YESNO) = IDNO then
@@ -1541,7 +1747,7 @@ begin
   end;
 
   #if TestID != 0
-    // Test Warning
+    // Test Warning, force pop up even with silent mode
     if WizardSupressMsgBoxes = False then
       MsgBox('THIS IS A TEST SETUP ID = {#TestID} [Setup v{#MySetupVersion} - Game v{#MyAppVersion}]' + #13#10 + 'PLEASE USE THIS INSTALLER ONLY FOR TESTING' + #13#10 + 'DO >>NOT<< SHARE IT!' , mbInformation, MB_OK);
   #endif
@@ -1565,141 +1771,141 @@ begin
   
   #if InstallType == "NeoEE"
     // Wine Environment Detection
-    if IsWine() and (WizardSupressMsgBoxes = False) then
-      MsgBox('Wine Detected !' + #13#10 + 'NeoEE connection GUI which causes the game to crash because it uses GDI will be disabled.', mbInformation, MB_OK);
+    if (IsWine() and not WizardSupressMsgBoxes) then
+      MsgBox('Wine Detected !' + #13#10 + 'NeoEE connection GUI which causes the game to crash because it uses GDI will be disabled.'
+              + #13#10 + 'You should be able to enable it again if you install GDI/GDI+ with winetricks', mbInformation, MB_OK);
   #endif
   
   #if AudioModule
-    if (WizardSupressMsgBoxes = False) then
-      begin
+    if ((not WizardSupressMsgBoxes and not IsWine()) or not IsWine()) then
+    begin
+      Log('Extracting sound and init audio lib');
       ExtractTemporaryFile('Loop.flac');
-	  InitBass := BASS_Init(-1, 44100, 0, 0, 0);
+      InitBass := BASS_Init(-1, 44100, 0, 0, 0);
       if InitBass then
       begin
         SoundStream := BASS_StreamCreateFile(False, 
           ExpandConstant('{tmp}\Loop.flac'), 0, 0, 0, 0, 
           EncodingFlag or BASS_SAMPLE_LOOP);
         BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, 2500);
-	  end;
-	end;
+      end;
+    end;
   #endif
   
   Result :=  True;
 end;
 
-function IsAnotherGameInstalled(Params: String): Boolean;
-begin
-  Result := False;
-
-  #if InstallType == "EE"
-      // EE
-      if RegValueExists(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{A24FCC7A-5491-4FEA-837B-4E4430C349DA}_is1', 'UninstallString')
-      or RegValueExists(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{A24FCC7A-5491-4FEA-837B-4E4430C349DA}_is1', 'UninstallString')
-      then begin
-        Result := True;
-      end;
-  #elif InstallType == "NeoEE"
-      // NeoEE
-      if RegValueExists(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{4C0B46D8-E7EB-4B95-97D4-A578D9B914C6}_is1', 'UninstallString')
-      or RegValueExists(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{4C0B46D8-E7EB-4B95-97D4-A578D9B914C6}_is1', 'UninstallString')
-      then begin
-        Result := True;
-      end;
-  #endif
-
-end;
-
-function IsAnotherGameInstalledWithCertificate: Boolean;
+function WizardIsAnotherGameTaskInstalledMultiSetup(Compo: String): Boolean;
 var
+  I: Integer;
   Tmp: String;
+  ArrayTmp: TArrayOfString;
 begin
   Result := False;
   #if InstallType == "EE"
-      // EE
-
-      if not IsAdminInstallMode and RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{A24FCC7A-5491-4FEA-837B-4E4430C349DA}_is1', 'Inno Setup: Selected Tasks', Tmp)
-      then begin
-        if Pos('certinclude', Tmp) > 0 then
+    if RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#NeoEE_AppID}_is1', 'Inno Setup: Selected Tasks', Tmp)
+    or RegQueryStringValue(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#NeoEE_AppID}_is1', 'Inno Setup: Selected Tasks', Tmp) then
+    begin
+      ArrayTmp := StrSplit(Tmp, ',');
+      for I := 0 to high(ArrayTmp) do 
+      begin
+        if Pos(Compo, ArrayTmp[I]) > 0 then
         begin
           Result := True;
           exit;
         end;
       end;
-
-      if IsAdminInstallMode and RegQueryStringValue(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{A24FCC7A-5491-4FEA-837B-4E4430C349DA}_is1', 'Inno Setup: Selected Tasks', Tmp)
-      then begin
-        if Pos('certinclude', Tmp) > 0 then
-        begin
-          Result := True;
-          exit;
-        end;
-      end;
+    end;
   #elif InstallType == "NeoEE"
-      // NeoEE
-      if not IsAdminInstallMode and RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{4C0B46D8-E7EB-4B95-97D4-A578D9B914C6}_is1', 'Inno Setup: Selected Tasks', Tmp)
-      then begin   
-        if Pos('certinclude', Tmp) > 0 then
+    if RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#EE_AppID}_is1', 'Inno Setup: Selected Tasks', Tmp)
+    or RegQueryStringValue(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#EE_AppID}_is1', 'Inno Setup: Selected Tasks', Tmp) then
+    begin
+      ArrayTmp := StrSplit(Tmp, ',');
+      for I := 0 to high(ArrayTmp) do 
+      begin
+        if Pos(Compo, ArrayTmp[I]) > 0 then
         begin
           Result := True;
           exit;
         end;
       end;
-
-      if IsAdminInstallMode and RegQueryStringValue(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{4C0B46D8-E7EB-4B95-97D4-A578D9B914C6}_is1', 'Inno Setup: Selected Tasks', Tmp)
-      then begin   
-        if Pos('certinclude', Tmp) > 0 then
-        begin
-          Result := True;
-          exit;
-        end;
-      end;
+    end;
   #endif  
 end;
 
-function WizardIsComponentSelectedCompatible(Compo: String): Boolean;
+function WizardIsTaskInstalledMultiSetup(Compo: String): Boolean;
 var
+  I: Integer;
   Tmp: String;
+  ArrayTmp: TArrayOfString;
 begin
   Result := False;
   #if InstallType == "EE"
-      // EE
-      if RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{4C0B46D8-E7EB-4B95-97D4-A578D9B914C6}_is1', 'Inno Setup: Selected Tasks', Tmp)
-      then begin   
-        if Pos(Compo, Tmp) > 0 then
+    if RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#EE_AppID}_is1', 'Inno Setup: Selected Tasks', Tmp)
+    or RegQueryStringValue(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#EE_AppID}_is1', 'Inno Setup: Selected Tasks', Tmp) then
+    begin
+      ArrayTmp := StrSplit(Tmp, ',');
+      for I := 0 to high(ArrayTmp) do 
+      begin
+        if Pos(Compo, ArrayTmp[I]) > 0 then
         begin
           Result := True;
           exit;
         end;
       end;
-
-      if RegQueryStringValue(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{4C0B46D8-E7EB-4B95-97D4-A578D9B914C6}_is1', 'Inno Setup: Selected Tasks', Tmp)
-      then begin   
-        if Pos(Compo, Tmp) > 0 then
-        begin
-          Result := True;
-          exit;
-        end;
-      end;
-      
+    end;
   #elif InstallType == "NeoEE"
-      // NeoEE
-      if RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{A24FCC7A-5491-4FEA-837B-4E4430C349DA}_is1', 'Inno Setup: Selected Tasks', Tmp)
-      then begin
-        if Pos(Compo, Tmp) > 0 then
+    if RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#NeoEE_AppID}_is1', 'Inno Setup: Selected Tasks', Tmp)
+    or RegQueryStringValue(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#NeoEE_AppID}_is1', 'Inno Setup: Selected Tasks', Tmp) then
+    begin
+      ArrayTmp := StrSplit(Tmp, ',');
+      for I := 0 to high(ArrayTmp) do 
+      begin
+        if Pos(Compo, ArrayTmp[I]) > 0 then
         begin
           Result := True;
           exit;
         end;
       end;
+    end;
+  #endif  
+end;
 
-      if RegQueryStringValue(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{A24FCC7A-5491-4FEA-837B-4E4430C349DA}_is1', 'Inno Setup: Selected Tasks', Tmp)
-      then begin
-        if Pos(Compo, Tmp) > 0 then
+function WizardIsComponentInstalledMultiSetup(Compo: String): Boolean;
+var
+  I: Integer;
+  Tmp: String;
+  ArrayTmp: TArrayOfString;
+begin
+  Result := False;
+  #if InstallType == "EE"
+    if RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#EE_AppID}_is1', 'Inno Setup: Selected Components', Tmp)
+    or RegQueryStringValue(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#EE_AppID}_is1', 'Inno Setup: Selected Components', Tmp) then
+    begin
+      ArrayTmp := StrSplit(Tmp, ',');
+      for I := 0 to high(ArrayTmp) do 
+      begin
+        if Pos(Compo, ArrayTmp[I]) > 0 then
         begin
           Result := True;
           exit;
         end;
       end;
+    end;
+  #elif InstallType == "NeoEE"
+    if RegQueryStringValue(HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#NeoEE_AppID}_is1', 'Inno Setup: Selected Components', Tmp)
+    or RegQueryStringValue(HKEY_LOCAL_MACHINE, 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#NeoEE_AppID}_is1', 'Inno Setup: Selected Components', Tmp) then
+    begin
+      ArrayTmp := StrSplit(Tmp, ',');
+      for I := 0 to high(ArrayTmp) do 
+      begin
+        if Pos(Compo, ArrayTmp[I]) > 0 then
+        begin
+          Result := True;
+          exit;
+        end;
+      end;
+    end;
   #endif  
 end;
 
@@ -1708,12 +1914,12 @@ procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
   ErrorCode: Integer;
 begin
-  if (CurUninstallStep = usUninstall) and (WizardIsComponentSelectedCompatible('certinclude')) then begin
-    if IsAdminInstallMode and not IsAnotherGameInstalledWithCertificate then
+  if (CurUninstallStep = usUninstall) and (WizardIsTaskInstalledMultiSetup('certinclude')) and (IsWine() = False) then begin
+    if IsAdminInstallMode and not WizardIsAnotherGameTaskInstalledMultiSetup('certinclude') then
     begin
       Exec(ExpandConstant('{sys}\certutil.exe'), '-delstore root ""{#CertHashSHA1}"""', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
     end
-    else if not IsAnotherGameInstalledWithCertificate and not IsAdminInstallMode then
+    else if not IsAdminInstallMode and not WizardIsAnotherGameTaskInstalledMultiSetup('certinclude') then
     begin
       Exec(ExpandConstant('{sys}\certutil.exe'), '-user -delstore root ""{#CertHashSHA1}""', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
     end;
@@ -1721,13 +1927,138 @@ begin
 end;
 #endif
 
+function ShouldSkipPage(PageID: Integer): Boolean;
+begin
+  // If components or taks page and recommanded install type -> don't show those page
+  if ((PageID = wpSelectComponents) or (PageID = wpSelectTasks)) and (ManualInstallQuestionPage.Values[3] = False) then
+  begin
+    Result := True;
+  end
+  else if (PageID = GPUInstallQuestionPage.ID) and ((ManualInstallQuestionPage.Values[0] = False) or IsWine()) then
+  begin
+    Result := True;
+  end;
+end;
+
+#if InstallType == "NeoEE"
+procedure RegisterCDKeys();
+var
+  AuthExitCode: Integer;
+begin
+    AuthExitCode := 0;
+    // NeoEE CDKeys Regedit Hell
+    // HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Sierra\CDKeys
+    // HKEY_LOCAL_MACHINE\Software\Sierra\CDKeys
+    if (WizardIsComponentSelected('game') and not WizardIsComponentSelected('gameaoc') and not IsWine()) then
+    begin
+      Log('Register NeoEE CD Keys for EE'); 
+      Exec(ExpandConstant('{tmp}\authtools.exe'), ExpandConstant('-eec={app}\Empire Earth, -authserv=neoee.net, -port=10003'), '',
+        SW_HIDE, ewWaitUntilTerminated, AuthExitCode);
+    end
+    else if (WizardIsComponentSelected('game') and WizardIsComponentSelected('gameaoc') and not IsWine()) then
+    begin
+      Log('Register NeoEE CD Keys for EE and AoC');
+      Exec(ExpandConstant('{tmp}\authtools.exe'), ExpandConstant('-eec={app}\Empire Earth, -aoc={app}\Empire Earth - The Art of Conquest, -authserv=neoee.net, -port=10003'), '',
+        SW_HIDE, ewWaitUntilTerminated, AuthExitCode);
+    end;
+    
+    Log('CD Keys generation result: ' + IntToStr(AuthExitCode));
+
+    if (WizardSupressMsgBoxes = False) then
+    begin
+      if (AuthExitCode = 1) then
+        MsgBox('Unable to install CD Keys: Virtual Machine Detected' + #13#10 + 'Contact Reborn or NeoEE devs to get a key for your Virtual Machine.', mbError, MB_OK)
+      else if (AuthExitCode = 2) then
+        MsgBox('Unable to install CD Keys: Unknown Error', mbError, MB_OK)
+      else if (AuthExitCode = 3) then
+        MsgBox('Unable to install CD Keys: Network Error' + #13#10 + 'If you very recently installed NeoEE this error is normal.', mbError, MB_OK)
+      else if (AuthExitCode = 5) then
+        MsgBox('Unable to install CD Keys: Sythax Error', mbError, MB_OK)
+      else if (AuthExitCode <> 0) then
+        MsgBox('Unknown error when installing CD Keys.', mbError, MB_OK)
+      else if (IsWine() = True) then
+        MsgBox('You are using Wine! Sadly CD Keys can''t be generated for security, we will probably implement that later.' + #13#10 + 
+          'For the moment contact Reborn or NeoEE devs to get a key for your Wine installation', mbError, MB_OK);
+    end;
+end;
+#endif
+
+function IsWindowsVersionOrNewer(Major, Minor: Integer): Boolean;
+var
+  Version: TWindowsVersion;
+begin
+  GetWindowsVersionEx(Version);
+  Result :=
+    (Version.Major > Major) or
+    ((Version.Major = Major) and (Version.Minor >= Minor));
+end;
+
+function IsWindows10OrNewer: Boolean;
+begin
+  Result := IsWindowsVersionOrNewer(10, 0);
+end;
+
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
-  
-  // Register files after components page
-  if (CurPageID = wpSelectComponents) then
-	begin
 
+  if (CurPageID = ManualInstallQuestionPage.ID) then
+  begin
+    if (ManualInstallQuestionPage.Values[0]) then
+    begin
+      if (ManualInstallQuestionPage.Values[1]) then
+      begin
+        WizardSelectComponents('game');
+        WizardSelectComponents('!gameaoc');
+      end
+      else if (ManualInstallQuestionPage.Values[2]) then
+      begin
+        WizardSelectComponents('game');
+        WizardSelectComponents('gameaoc');
+      end;
+    end
+    else if (IsGameInstalled() and not ManualInstallQuestionPage.Values[0]) then
+    begin
+      // For some reasons WizardSelectComponents (on top) will badly unselect the component
+      // This make any component(/task?) unselected by code automatically re-selected on reinstall...  
+      if (WizardIsComponentInstalledMultiSetup('gameaoc')) then
+        WizardSelectComponents('gameaoc')
+      else
+        WizardSelectComponents('!gameaoc');
+    end;
+  end;
+
+  if (CurPageID = GPUInstallQuestionPage.ID) then
+  begin
+
+    if (GPUInstallQuestionPage.Values[0]) then          // NVIDIA
+    begin
+      Log('Using NVIDIA GPU settings');
+      WizardSelectComponents('!additional\directx_wrapper');
+    end
+    else if (GPUInstallQuestionPage.Values[1]) then     // AMD
+    begin
+      Log('Using AMD GPU settings');
+      if (IsWindows10OrNewer) then     
+        WizardSelectComponents('additional\directx_wrapper\dx12_lvl11')
+      else
+        WizardSelectComponents('additional\directx_wrapper\dx11_lvl10');
+    end
+    else if (GPUInstallQuestionPage.Values[2]) then     // Intel Sh$t
+    begin
+      Log('Using Intel GPU settings');
+      WizardSelectComponents('additional\directx_wrapper\dx11_lvl10');
+    end
+    else if (GPUInstallQuestionPage.Values[3]) then     // Idk
+    begin
+      Log('Using general GPU settings');  
+      WizardSelectComponents('additional\directx_wrapper\dx9');
+    end;
+
+  end;
+
+  // Register files after components page
+  if (CurPageID = wpReady) then
+	begin
     // Register Online Files (Game default is in english, online files will recover the located one if asked)
     // Mirror Order
     // EE Community HTTPS (Energy) => Zocker HTTPS => EE Community HTTP (Energy) => Zocker HTTP
@@ -1735,8 +2066,10 @@ begin
     // Note: EELearningCampaign.ssa is the same for AoC, the setup will copy the one of EE
     
     // Clears files if the user have the bad idea of going back to component to change them
+    Log('Clear download file list');
     idpClearFiles();
 
+    Log('Adding file list to download');
     // EE Community Server HTTPS
     idpAddFileComp(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Language.dll'), ExpandConstant('{tmp}\EE\Language.dll'), 'game\update'); 
     idpAddFileComp(ExpandConstant('https://{#UpdateUrl}/localized/{language}/EE/Data/data.ssa'), ExpandConstant('{tmp}\EE\Data\data.ssa'), 'game\update');
@@ -1883,17 +2216,19 @@ begin
       idpAddMirror(ExpandConstant('https://{#UpdateUrl}/localized/{language}/AoC/Data/WONLobby Resources/_LobbyResource_Neo.cfg'), ExpandConstant('http://{#UpdateUrlMirror}/localized/{language}/AoC/Data/WONLobby Resources/_LobbyResource_Neo.cfg'));
     #endif
   end;
-  
   Result := True;
 end;
 
 procedure DeinitializeSetup;
 begin
   #if AudioModule
-    BASS_Free;
+    if (IsWine() = False) then
+    begin
+      BASS_Free;
+    end;
   #endif
 end;
- 
+
 procedure InitializeWizard;
 var
   BackgroundImage: TBitmapImage;
@@ -1901,49 +2236,85 @@ var
   ScrWidth: double;
   ScrHeight: double;
 begin
+
+  // Manual or custom install page
+  Log('Create install manual/custom page');
+  ManualInstallQuestionPage :=
+    CreateInputOptionPage(wpSelectDir, ExpandConstant('{cm:MIQP_Title}'),
+      ExpandConstant('{cm:MIQP_Desc}'), ExpandConstant('{cm:MIQP_Content}'), True, False);
+
+  ManualInstallQuestionPage.AddEx('&' + ExpandConstant('{cm:MIQP_Recommanded}'), 1, True);
+  ManualInstallQuestionPage.AddEx('&' + ExpandConstant('{cm:MIQP_Recommanded_EE}'), 1, True);
+  ManualInstallQuestionPage.AddEx('&' + ExpandConstant('{cm:MIQP_Recommanded_EE_AoC}'), 1, True);
+  ManualInstallQuestionPage.AddEx('&' + ExpandConstant('{cm:MIQP_Custom}'), 0, True);
+  ManualInstallQuestionPage.Values[0] := True; 
+  ManualInstallQuestionPage.Values[1] := True;
   
-  #if AudioModule
-    if InitBass then
-    begin
-      BASS_ChannelPlay(SoundStream, False);
-      SoundCtrlButton := TNewButton.Create(WizardForm);
-      SoundCtrlButton.Parent := WizardForm; 
-      SoundCtrlButton.Left := WizardForm.InnerNotebook.Left / 2; //+ WizardForm.OuterNotebook.Left
-      //SoundCtrlButton.Left := WizardForm.ClientWidth - WizardForm.NextButton.Left - WizardForm.NextButton.Width;
-      SoundCtrlButton.Top := WizardForm.NextButton.Top;
-      SoundCtrlButton.Width := WizardForm.NextButton.Width;
-      SoundCtrlButton.Height := WizardForm.NextButton.Height
-      SoundCtrlButton.Anchors := [akLeft, akBottom];
-      SoundCtrlButton.Caption := ExpandConstant('&{cm:SoundCtrlButtonCaptionSoundOff}');
-      SoundCtrlButton.OnClick := @SoundCtrlButtonClick;
-    end;
-  #endif
+  if (IsGameInstalled()) then
+  begin           
+    ManualInstallQuestionPage.AddEx('&' + ExpandConstant('{cm:MIQP_Repair}'), 0, True)
+    ManualInstallQuestionPage.Values[4] := True
+  end;
 
+  // GPU vendor slector page
+  Log('Create GPU DirectX Wrapper selection');
+  GPUInstallQuestionPage :=
+    CreateInputOptionPage(ManualInstallQuestionPage.ID, ExpandConstant('{cm:GPUIQP_Title}'),
+      ExpandConstant('{cm:GPUIQP_Desc}'), ExpandConstant('{cm:GPUIQP_Content}'), True, False);
 
-  if (WizardSupressMsgBoxes = False) then
+  GPUInstallQuestionPage.Add('&' + ExpandConstant('{cm:GPUIQP_NVIDIA}') + ' (DirectX Native)');
+  if (IsWindows10OrNewer) then
+    GPUInstallQuestionPage.Add('&' + ExpandConstant('{cm:GPUIQP_AMD}') + ' (DirectX Wrapper 12)')
+  else                                                                                         
+    GPUInstallQuestionPage.Add('&' + ExpandConstant('{cm:GPUIQP_AMD}') + ' (DirectX Wrapper 11)');
+  GPUInstallQuestionPage.Add('&' + ExpandConstant('{cm:GPUIQP_Intel}' + ' (DirectX Wrapper 11)'));
+  GPUInstallQuestionPage.Add('&' + ExpandConstant('{cm:GPUIQP_Default}' + ' (DirectX Wrapper 9)'));
+  GPUInstallQuestionPage.Values[3] := True;
+  
+  Log('Init setup background');
+  BackgroundImage := TBitmapImage.Create(MainForm);
+  BackgroundImage.Parent := MainForm;
+  BackgroundImage.SetBounds(0, 0, MainForm.ClientWidth, MainForm.ClientHeight);
+  BackgroundImage.Stretch := True;
+
+  // Auto Select 16:9 or 4:3
+  ScrWidth := MainForm.ClientWidth;
+  ScrHeight := MainForm.ClientHeight;
+
+  Diff := ScrWidth / ScrHeight
+  
+  Log('Extracting and defining image banner');
+  if (Diff > 1.55) then
   begin
-    BackgroundImage := TBitmapImage.Create(MainForm);
-    BackgroundImage.Parent := MainForm;
-    BackgroundImage.SetBounds(0, 0, MainForm.ClientWidth, MainForm.ClientHeight);
-    BackgroundImage.Stretch := True;
+    ExtractTemporaryFile('SetupBackground-16-9.bmp');
+    BackgroundImage.Bitmap.LoadFromFile(ExpandConstant('{tmp}\SetupBackground-16-9.bmp'));
+  end;
 
-    // Auto Select 16:9 or 4:3
-    ScrWidth := MainForm.ClientWidth;
-    ScrHeight := MainForm.ClientHeight;
+  if (Diff <= 1.55) then
+  begin
+    ExtractTemporaryFile('SetupBackground-4-3.bmp');
+    BackgroundImage.Bitmap.LoadFromFile(ExpandConstant('{tmp}\SetupBackground-4-3.bmp'));
+  end;
 
-    Diff := ScrWidth / ScrHeight
-    
-    if (Diff > 1.55) then
-    begin
-      ExtractTemporaryFile('SetupBackground-16-9.bmp');
-      BackgroundImage.Bitmap.LoadFromFile(ExpandConstant('{tmp}\SetupBackground-16-9.bmp'));
-    end;
-
-    if (Diff <= 1.55) then
-    begin
-      ExtractTemporaryFile('SetupBackground-4-3.bmp');
-      BackgroundImage.Bitmap.LoadFromFile(ExpandConstant('{tmp}\SetupBackground-4-3.bmp'));
-    end;
+  if ((WizardSupressMsgBoxes = False and IsWine() = False) or IsWine()) = False then
+  begin
+    #if AudioModule
+      if InitBass then
+      begin
+        Log('Start sound and create sound button');
+        BASS_ChannelPlay(SoundStream, False);
+        SoundCtrlButton := TNewButton.Create(WizardForm);
+        SoundCtrlButton.Parent := WizardForm; 
+        SoundCtrlButton.Left := WizardForm.InnerNotebook.Left / 2; //+ WizardForm.OuterNotebook.Left
+        //SoundCtrlButton.Left := WizardForm.ClientWidth - WizardForm.NextButton.Left - WizardForm.NextButton.Width;
+        SoundCtrlButton.Top := WizardForm.NextButton.Top;
+        SoundCtrlButton.Width := WizardForm.NextButton.Width;
+        SoundCtrlButton.Height := WizardForm.NextButton.Height
+        SoundCtrlButton.Anchors := [akLeft, akBottom];
+        SoundCtrlButton.Caption := ExpandConstant('&{cm:SoundCtrlButtonCaptionSoundOff}');
+        SoundCtrlButton.OnClick := @SoundCtrlButtonClick;
+      end;
+    #endif
   end;
     
   // Create tmp dir to download files

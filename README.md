@@ -1,13 +1,14 @@
 ![Visitor count](https://shields-io-visitor-counter.herokuapp.com/badge?page=EE-modders.Empire-Earth-Setup)
 [![GitHub stars](https://img.shields.io/github/stars/EE-modders/Empire-Earth-Setup)](https://github.com/EE-modders/Empire-Earth-Setup/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/EE-modders/Empire-Earth-Setup)](https://github.com/EE-modders/Empire-Earth-Setup/network)
-[![Setup Version](https://img.shields.io/badge/Setup%20Version-v1.0.2.0-blue)](https://github.com/EE-modders/Empire-Earth-Setup)
+[![Setup Version](https://img.shields.io/badge/Setup%20Version-v1.0.3.0-blue)](https://github.com/EE-modders/Empire-Earth-Setup)
 # 📥 Empire Earth Community Setup
 
 ## Features
 🎮 Empire Earth & The Art of Conquest\
 🌐 NeoEE (with CD Keys generation)\
 🗺️ Support 11 languages\
+💡 Simple and advanced installation mode\
 📣 Discord Status\
 📥 Download localized content online (support mirror)\
 ✅ Online update checker (support mirror)\
@@ -18,7 +19,7 @@
 🔥 Registered in Firewall (Admin)\
 📥 DirectX 9 Install (when using DirectX Wrapper for DirectX 9)\
 🔑 You can now register NeoEE without admin right\
-🛠️ New tool included: Empire Earth Diagnostic v1.0.0.0\
+🛠️ Tool included: Empire Earth Diagnostic v1.0.0.1\
 🔐 Digitally (self-)signed
 
 ## Notes for Modders
