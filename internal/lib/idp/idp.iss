@@ -30,10 +30,20 @@
 #define IDP_VER_REV
 #define IDP_VER_BUILD
 
-#expr ParseVersion(IDPDLLDIR + "\idp.dll", IDP_VER_MAJOR, IDP_VER_MINOR, IDP_VER_REV, IDP_VER_BUILD)
+#if Ver >= EncodeVer(6, 0, 0)
+  #expr GetVersionComponents(IDPDLLDIR + "\idp.dll", IDP_VER_MAJOR, IDP_VER_MINOR, IDP_VER_REV, IDP_VER_BUILD)
+#else
+  #expr ParseVersion(IDPDLLDIR + "\idp.dll", IDP_VER_MAJOR, IDP_VER_MINOR, IDP_VER_REV, IDP_VER_BUILD)
+#endif
+
 #define IDP_VER EncodeVer(IDP_VER_MAJOR, IDP_VER_MINOR, IDP_VER_REV, IDP_VER_BUILD)
 
-#define IDP_VER_STR GetFileVersion(IDPDLLDIR + "\idp.dll")
+#if Ver >= EncodeVer(6, 0, 0)
+  #define IDP_VER_STR GetVersionNumbersString(IDPDLLDIR + "\idp.dll")
+#else
+  #define IDP_VER_STR GetFileVersion(IDPDLLDIR + "\idp.dll")
+#endif
+
 
 [Files]
 Source: "{#IDPDLLDIR}\idp.dll"; Flags: dontcopy noencryption nocompression;
@@ -665,3 +675,12 @@ begin
 end;
 
 #include <idplang\default.iss>
+
+#include <idplang\German.iss>
+#include <idplang\French.iss>
+#include <idplang\Italian.iss>
+#include <idplang\Polish.iss>
+#include <idplang\Chinese.iss>
+#include <idplang\BrazilianPortuguese.iss>
+#include <idplang\Russian.iss>
+#include <idplang\Spanish.iss>
