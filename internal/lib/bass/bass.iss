@@ -72,7 +72,7 @@ begin
 
   if not Muted then
   begin
-    if BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, 0) then
+    if BASS_Pause then
     begin
       SoundCtrlButton.Caption := ExpandConstant('{cm:SoundCtrlButtonCaptionSoundOn}');
       Muted := True;
@@ -80,7 +80,7 @@ begin
   end
     else
   begin
-    if BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, 2500) then
+    if BASS_Start then
     begin
       SoundCtrlButton.Caption := ExpandConstant('{cm:SoundCtrlButtonCaptionSoundOff}');
       Muted := False;
@@ -92,8 +92,7 @@ procedure bassCreateButton;
 begin
   if InitBass then
   begin
-    Log('Start sound and create sound button');
-    BASS_ChannelPlay(SoundStream, False);
+    Log('Create sound button');
     SoundCtrlButton := TNewButton.Create(WizardForm);
     SoundCtrlButton.Parent := WizardForm; 
     SoundCtrlButton.Left := WizardForm.InnerNotebook.Left / 2; //+ WizardForm.OuterNotebook.Left
@@ -106,6 +105,18 @@ begin
     SoundCtrlButton.OnClick := @SoundCtrlButtonClick;
   end;
 end;
+
+procedure bassPlay;
+begin
+  if (not InitBass) then
+  begin
+    Log('Trying to play sound but BASS isn''t init!');
+    Exit;
+  end;
+  Log('Play sound');
+  BASS_ChannelPlay(SoundStream, False);
+end;
+
 
 function bassInit: Boolean;
 begin

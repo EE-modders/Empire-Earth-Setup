@@ -25,7 +25,13 @@ function GetUninstallRegPath(Reverse: Boolean): String;
 begin
   if not Reverse then
   begin
-    Result := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#SetupSetting("AppId")}_is1';
+#if InstallType == "EE"
+    Result := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{{#EE_AppID}}_is1';
+#elif InstallType == "NeoEE" 
+    Result := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{{#NeoEE_AppID}}_is1';
+#else
+  #error "Unknown Install Type"
+#endif
   end else begin 
 #if InstallType == "EE"
     Result := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{{#NeoEE_AppID}}_is1';
@@ -56,7 +62,7 @@ begin
 end;
 
 // Return HTTP code or -1 if error
-function SendRequest(const URL: String): Integer;
+function SendRequest(const URL: String; const HttpFallback: Boolean): Integer;
 var
   WinHttpRequest: Variant;
   Https: Boolean;
@@ -74,7 +80,7 @@ begin
 
   try
     WinHttpRequest := CreateOleObject('WinHttp.WinHttpRequest.5.1'); // 5.0 for < Win2000 SP3 / WinXP SP1 ?
-    WinHttpRequest.SetTimeouts(8000, 8000, 8000, 8000);
+    WinHttpRequest.SetTimeouts(6000, 4000, 4000, 4000);
     WinHttpRequest.Open('GET', URL, False);
     WinHttpRequest.Send;
     WinHttpRequest.WaitForResponse();
@@ -84,16 +90,16 @@ begin
     Log('Failed request: ' + URL);
     Log(GetExceptionMessage);
     Result := -1;
-    if (Https) then
+    if (Https and HttpFallback) then
     begin
       Log('URL was using HTTPS, trying HTTP as fallback...');
       StringChangeEx(URL, 'https', 'http', True);
-      Result := SendRequest(URL);
+      Result := SendRequest(URL, False);
     end;
   end;
 end;
 
-function DownloadString(const URL: string; var Response: string): Integer;
+function DownloadString(const URL: string; var Response: string; const HttpFallback: Boolean): Integer;
 var
   WinHttpRequest: Variant;
   Https: Boolean;
@@ -109,7 +115,7 @@ begin
   try
     Response := '';
     WinHttpRequest := CreateOleObject('WinHttp.WinHttpRequest.5.1'); // 5.0 for < Win2000 SP3 / WinXP SP1 ?
-    WinHttpRequest.SetTimeouts(10000, 5000, 5000, 5000);
+    WinHttpRequest.SetTimeouts(8000, 4000, 4000, 4000);
     WinHttpRequest.Open('GET', URL, False);
     WinHttpRequest.Send;
     WinHttpRequest.WaitForResponse(); 
@@ -120,11 +126,11 @@ begin
     Log('Failed to download: ' + URL);
     Log(GetExceptionMessage);
     Result := -1;
-    if (Https) then
+    if (Https and HttpFallback) then
     begin
       Log('URL was using HTTPS, trying HTTP as fallback...');
       StringChangeEx(URL, 'https', 'http', True);
-      Result := DownloadString(URL, Response);
+      Result := DownloadString(URL, Response, False);
     end;
   end;
 end;

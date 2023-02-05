@@ -1,0 +1,6 @@
+data/
+out/
+tools/
+internal/media
+internal/misc
+internal/runtime
