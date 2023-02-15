@@ -32,4 +32,4 @@ Empire Earth is very sensitive to version change (which leads to multiplayer inc
 Since the script is licensed under the GNU GPL v3 you have every right to modify the setup script to generate your own versions, but you must also publish the source code of the script. So I invite you to fork this project if you want and I pray you don't forget that we have to do everything to unite the community around the world, if you have ideas of modifications to do don't hesitate to make suggestions, I also invite you to make pull requests if you think you have done something that deserves to be in this script. The version of the script I'm distributing should become the standard to facilitate future installations. I hope you understand the objective and how necessary and helpful it is for everyone. If you think something is wrong, don't hesitate to tell me!
 
 ## License
-Consider setup_is6.iss under **GPL-3.0 License**.
+Consider setup_is6.iss, utils.iss, pages.iss, messages.iss, extention.iss under **GPL-3.0 License**.

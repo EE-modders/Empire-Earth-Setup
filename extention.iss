@@ -17,12 +17,17 @@ begin
   end;
 end;
 
-function SilentInstall(): Boolean;
+function SuppressMsgBoxes(): Boolean;
 begin
   // Log('SUPPRESSMSGBOXES: ' + IntToStr(WizardContainsParam('/SUPPRESSMSGBOXES')));
+  Result := WizardContainsParam('/SUPPRESSMSGBOXES');
+end;
+
+function SilentInstall(): Boolean;
+begin
   // Log('VERYSILENT: ' + IntToStr(WizardContainsParam('/VERYSILENT'));
   // Log('SILENT: ' + IntToStr(WizardSilent);
-  Result := (WizardContainsParam('/SUPPRESSMSGBOXES') or WizardContainsParam('/VERYSILENT') or WizardSilent);
+  Result := (WizardContainsParam('/VERYSILENT') or WizardSilent);
 end;
 
 function WizardIsTaskInstalledMultiSetup(Task: String): Boolean;

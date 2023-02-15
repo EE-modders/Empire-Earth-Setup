@@ -1,4 +1,28 @@
 [Code]
+
+// Read Selected Components to try to find the language
+function GetSelectedLanguageFromRegistry(): String;
+var
+  i: Integer;
+begin
+  RegQueryStringValue(HKA, GetUninstallRegPath(False), 'Inno Setup: Selected Components', Result);
+  if (Result = '') then
+  begin
+    Result := 'en';
+    Exit;
+  end;
+
+  for i := 0 to Langs.Count - 1 do
+  begin
+    if (Pos('language\' + Langs[i], Result) > 0) then
+    begin
+      Result := Langs[i];
+      Exit;
+    end;
+  end;
+end;
+
+
 procedure SetupLanguagePage;
 var
   i: Integer;
@@ -38,6 +62,20 @@ begin
     end;
   end;
 
+  // If game is installed, try to find the language from the registry
+  if (IsGameInstalled()) then
+  begin
+    for i := 0 to Langs.Count - 1 do
+    begin
+      if (Langs[i] = GetSelectedLanguageFromRegistry()) then
+      begin
+        LanguageInstallQuestionPage.Values[i] := True;
+        SuccessufllySelected := True;
+        Break;
+      end;
+    end;
+  end;
+
   // Last resort, select the first language in the list
   if (not SuccessufllySelected) then
     LanguageInstallQuestionPage.Values[0] := True;
@@ -65,7 +103,7 @@ begin
       ManualInstallQuestionPage.AddEx('&' + ExpandConstant('{cm:MIQP_Update}'), 0, True)
     else
       ManualInstallQuestionPage.AddEx('&' + ExpandConstant('{cm:MIQP_Repair}'), 0, True);
-    ManualInstallQuestionPage.Values[4] := True
+    ManualInstallQuestionPage.Values[4] := WizardIsComponentInstalledMultiSetup('additional\telemetry'); 
   end;
 
   if (not WizardIsComponentInstalledMultiSetup('additional\telemetry')) then
@@ -73,11 +111,11 @@ begin
     if (IsGameInstalled()) then
     begin
       ManualInstallQuestionPage.AddEx('&' + ExpandConstant('{cm:MIQP_Telemetry}'), 0, False);
-      ManualInstallQuestionPage.Values[5] := True
+      ManualInstallQuestionPage.Values[5] := WizardIsComponentInstalledMultiSetup('additional\telemetry');
     end
     else begin
       ManualInstallQuestionPage.AddEx('&' + ExpandConstant('{cm:MIQP_Telemetry}'), 0, False);
-      ManualInstallQuestionPage.Values[4] := True
+      ManualInstallQuestionPage.Values[4] := WizardIsComponentInstalledMultiSetup('additional\telemetry');
     end
   end;
 end;

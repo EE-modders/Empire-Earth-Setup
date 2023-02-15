@@ -484,7 +484,7 @@ Name: "additional\civs\ec"; Description: "eC Standard Civilizations (25)"; Types
 Name: "additional\civs\ec_full"; Description: "eC Full Civilizations (71)"
 Name: "additional\civs\j2"; Description: "J2 Civilizations (19)"; Types: full compact
 
-Name: "language"; Description: "Game Language"; Flags: disablenouninstallwarning fixed; Types: full compact custom
+Name: "language"; Description: "Game Language"; Types: full compact custom; Flags: disablenouninstallwarning fixed;
 Name: "language\de"; Description: "{cm:LIQP_de}"; Flags: exclusive;
 Name: "language\en"; Description: "{cm:LIQP_en}"; Flags: exclusive;
 Name: "language\es"; Description: "{cm:LIQP_es}"; Flags: exclusive;
@@ -552,29 +552,52 @@ Source: "data\localized-text\Game\zh-CN\EE\Language.dll"; DestDir: "{app}\Empire
 Source: "data\localized-text\Game\zh-TW\EE\Language.dll"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\zh_TW
 
 ; EE Lang Lobby Based Content
-Source: "data\localized-text\Lobby\de\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\de
-Source: "data\localized-text\Lobby\en\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\en
-Source: "data\localized-text\Lobby\es\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\es
-Source: "data\localized-text\Lobby\fr\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\fr
-Source: "data\localized-text\Lobby\it\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\it
-Source: "data\localized-text\Lobby\ko\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\ko
-Source: "data\localized-text\Lobby\pl\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\pl
-Source: "data\localized-text\Lobby\pt-BR\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\pt_BR
-Source: "data\localized-text\Lobby\ru\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\ru
-Source: "data\localized-text\Lobby\zh\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and (language\zh_CN or language\zh_TW)
+Source: "data\localized-text\Lobby\de\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\de
+Source: "data\localized-text\Lobby\en\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\en
+Source: "data\localized-text\Lobby\es\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\es
+Source: "data\localized-text\Lobby\fr\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\fr
+Source: "data\localized-text\Lobby\it\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\it
+Source: "data\localized-text\Lobby\ko\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\ko
+Source: "data\localized-text\Lobby\pl\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\pl
+Source: "data\localized-text\Lobby\pt-BR\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\pt_BR
+Source: "data\localized-text\Lobby\ru\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\ru
+Source: "data\localized-text\Lobby\zh\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and (language\zh_CN or language\zh_TW)
+
+Source: "data\localized-text\Lobby\de\shared\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\de
+Source: "data\localized-text\Lobby\en\shared\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\en
+Source: "data\localized-text\Lobby\es\shared\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\es
+Source: "data\localized-text\Lobby\fr\shared\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\fr
+Source: "data\localized-text\Lobby\it\shared\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\it
+Source: "data\localized-text\Lobby\ko\shared\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\ko
+Source: "data\localized-text\Lobby\pl\shared\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\pl
+Source: "data\localized-text\Lobby\pt-BR\shared\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\pt_BR
+Source: "data\localized-text\Lobby\ru\shared\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\ru
+Source: "data\localized-text\Lobby\zh\shared\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and (language\zh_CN or language\zh_TW)
+
 
 #if InstallType == "NeoEE"
   ; NeoEE Lang Lobby Based Content
-  Source: "data\localized-text\Mods\NeoEE\Lobby\de\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\de
-  Source: "data\localized-text\Mods\NeoEE\Lobby\en\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\en
-  Source: "data\localized-text\Mods\NeoEE\Lobby\es\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\es
-  Source: "data\localized-text\Mods\NeoEE\Lobby\fr\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\fr
-  Source: "data\localized-text\Mods\NeoEE\Lobby\it\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\it
-  Source: "data\localized-text\Mods\NeoEE\Lobby\ko\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\ko
-  Source: "data\localized-text\Mods\NeoEE\Lobby\pl\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\pl
-  Source: "data\localized-text\Mods\NeoEE\Lobby\pt-BR\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\pt_BR
-  Source: "data\localized-text\Mods\NeoEE\Lobby\ru\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\ru
-  Source: "data\localized-text\Mods\NeoEE\Lobby\zh\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and (language\zh_CN or language\zh_TW)
+  Source: "data\localized-text\Mods\NeoEE\Lobby\de\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\de
+  Source: "data\localized-text\Mods\NeoEE\Lobby\en\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\en
+  Source: "data\localized-text\Mods\NeoEE\Lobby\es\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\es
+  Source: "data\localized-text\Mods\NeoEE\Lobby\fr\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\fr
+  Source: "data\localized-text\Mods\NeoEE\Lobby\it\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\it
+  Source: "data\localized-text\Mods\NeoEE\Lobby\ko\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\ko
+  Source: "data\localized-text\Mods\NeoEE\Lobby\pl\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\pl
+  Source: "data\localized-text\Mods\NeoEE\Lobby\pt-BR\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\pt_BR
+  Source: "data\localized-text\Mods\NeoEE\Lobby\ru\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\ru
+  Source: "data\localized-text\Mods\NeoEE\Lobby\zh\EE\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and (language\zh_CN or language\zh_TW)
+
+  Source: "data\localized-text\Mods\NeoEE\Lobby\de\shared\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\de
+  Source: "data\localized-text\Mods\NeoEE\Lobby\en\shared\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\en
+  Source: "data\localized-text\Mods\NeoEE\Lobby\es\shared\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\es
+  Source: "data\localized-text\Mods\NeoEE\Lobby\fr\shared\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\fr
+  Source: "data\localized-text\Mods\NeoEE\Lobby\it\shared\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\it
+  Source: "data\localized-text\Mods\NeoEE\Lobby\ko\shared\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\ko
+  Source: "data\localized-text\Mods\NeoEE\Lobby\pl\shared\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\pl
+  Source: "data\localized-text\Mods\NeoEE\Lobby\pt-BR\shared\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\pt_BR
+  Source: "data\localized-text\Mods\NeoEE\Lobby\ru\shared\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and language\ru
+  Source: "data\localized-text\Mods\NeoEE\Lobby\zh\shared\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game and (language\zh_CN or language\zh_TW)
 #endif
 
 ; EE Online Lang Any Based Content
@@ -1340,6 +1363,7 @@ begin
   Langs.Add('ru');
   Langs.Add('zh_CN');
   Langs.Add('zh_TW');
+  Log('Registered languages: ' + Langs.CommaText);
 end;
 
 function InitializeSetup: Boolean;
@@ -1358,7 +1382,7 @@ begin
     Log('Wine detected v' + EEStats_getWineVersion());
   end;
 
-  if (SilentInstall) then
+  if (not SuppressMsgBoxes and not SilentInstall) then
   begin
     if (CheckUpdate()) then
     begin
@@ -1370,7 +1394,7 @@ begin
   end;
 
   // Already Installed
-  if (not IsGameInstalled and not SilentInstall) then
+  if (not IsGameInstalled and (not SilentInstall and not SuppressMsgBoxes)) then
   begin
     // Legal Question
     if MsgBox(ExpandConstant('{cm:LegalQuestion}'), mbConfirmation, MB_YESNO) = IDNO then
@@ -1386,7 +1410,7 @@ begin
 #endif
 
   // AntiVirus/Portable/User Warning
-  if (not SilentInstall) then
+  if (not SilentInstall and not SuppressMsgBoxes) then
   begin
     if IsAdminInstallMode and not IsWine then
     begin
@@ -1406,7 +1430,7 @@ begin
 
 #if InstallType == "NeoEE"
   // Wine Environment Detection
-  if (IsWine() and not SilentInstall) then
+  if (IsWine() and (not SilentInstall and not SuppressMsgBoxes)) then
     MsgBox('Wine Detected !' + #13#10 + 'NeoEE connection GUI which causes the game to crash because it uses GDI/GDI+!'
             + #13#10 + 'To avoid crash the NeoEE connection GUI will be disabled, if you install it with Winetricks you can enable the GUI again in NeoEE.cfg.', mbInformation, MB_OK);
 #endif
@@ -1512,6 +1536,7 @@ end;
 
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
+  Result := False;
   if ((PageID = GPUInstallQuestionPage.ID) and (GPUInstallQuestionPage.Values[3] = False)) then
   begin
     Result := True;
@@ -1523,7 +1548,7 @@ begin
   end else if (PageID = GPUInstallQuestionPage.ID) and ((ManualInstallQuestionPage.Values[0] = False) or IsWine()) then
   begin
     Result := True;
-  end;
+  end
 end;
 
 #if InstallType == "NeoEE"
@@ -1533,7 +1558,7 @@ var
 begin
     AuthExitCode := 0;
 
-    if (IsWine() and not SilentInstall) then
+    if (IsWine() and (not SilentInstall and not SuppressMsgBoxes)) then
     begin
         MsgBox('You are using Wine! Sadly CD Keys can''t be generated for security, we will probably implement that later.' + #13#10 +
           'For the moment contact Reborn or NeoEE devs to get a key for your Wine installation', mbError, MB_OK)
@@ -1543,7 +1568,7 @@ begin
     if (not FileExists(ExpandConstant('{tmp}\authtools.dll'))) then
     begin
         Log('CD Keys generation failed! Unable to find authtools! Probably removed by the Anti-Virus! (Pre-generation error)')
-        if (not SilentInstall) then
+        if (not SilentInstall and not SuppressMsgBoxes) then
           MsgBox('Your Anti-Virus deleted the file used to generate the NeoEE CD Keys, making your game unable to play on NeoEE.' + #13#10 +
             'Please disable your Anti-Virus and install NeoEE again!! (Pre-generation error)', mbError, MB_OK);
         Exit;
@@ -1572,7 +1597,7 @@ begin
     if (not FileExists(ExpandConstant('{tmp}\authtools.dll'))) then
     begin
         Log('CD Keys generation failed! Unable to find authtools! Probably removed by the Anti-Virus! (Post-generation error)')
-        if (not SilentInstall) then
+        if (not SilentInstall and not SuppressMsgBoxes) then
           MsgBox('Your Anti-Virus deleted the file used to generate the NeoEE CD Keys, making your game unable to play on NeoEE.' + #13#10 +
             'Please disable your Anti-Virus and install NeoEE again!! (Post-generation error)', mbError, MB_OK);
         Exit;
@@ -1619,8 +1644,8 @@ begin
   // EE Community (Energy) => Zocker
   // Storage Localized structure : {base_url}/localized/{scope}/{language}/{GameType}/
   // Note: EELearningCampaign.ssa is the same for AoC, the setup will copy the one of EE
-  BaseDomainName := 'https://files.' + DomainMain + '/localized';
-  BaseDomainMirror := 'https://storage.' + BaseDomainMirror + '/localized';
+  BaseDomainName := 'https://files.' + DomainMain + '/_localized';
+  BaseDomainMirror := 'https://storage.' + DomainMirror + '/localized';
   LangCode := CorrectLanguageCode(GetSelectedLanguageFromComponents(''));
 
   // Clears files if the user have the bad idea of going back to component to change them
@@ -1630,8 +1655,14 @@ begin
   if ((SendRequest(BaseDomainName, True) = -1) and (SendRequest(BaseDomainMirror, True) = -1)) then
   begin
     Log('Unable to reach the online files server! The setup will only use local files...');
-    if (not SilentInstall) then
+    if (not SilentInstall and not SuppressMsgBoxes) then
       MsgBox('Unable to reach the online files servers! The setup will using only local setup files. Some content may not be translated.', mbError, MB_OK);
+    Exit;
+  end;
+
+  if (LangCode = 'en') then
+  begin
+    Log('English language selected, no need to download online files.');
     Exit;
   end;
 
@@ -1793,7 +1824,7 @@ begin
     end;
   end;
 
-  if (not SilentInstall and (CurPageID = LanguageInstallQuestionPage.ID)) then
+  if (CurPageID = LanguageInstallQuestionPage.ID) then
   begin
     for i := 0 to Langs.Count - 1 do
     begin
