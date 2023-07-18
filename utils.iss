@@ -62,7 +62,7 @@ begin
 end;
 
 // Return HTTP code or -1 if error
-function SendRequest(const URL: String; const HttpFallback: Boolean): Integer;
+function SendRequest(const URL: String; const HttpFallback: Boolean; const Asynchronous: Boolean): Integer;
 var
   WinHttpRequest: Variant;
   Https: Boolean;
@@ -83,8 +83,13 @@ begin
     WinHttpRequest.SetTimeouts(6000, 4000, 4000, 4000);
     WinHttpRequest.Open('GET', URL, False);
     WinHttpRequest.Send;
-    WinHttpRequest.WaitForResponse();
-    Result := WinHttpRequest.Status;
+    if (Asynchronous) then
+    begin
+      Result := -2
+    end else begin
+      WinHttpRequest.WaitForResponse()
+      Result := WinHttpRequest.Status;
+    end;
     Log('Status: ' + IntToStr(Result));
   except
     Log('Failed request: ' + URL);
@@ -94,7 +99,7 @@ begin
     begin
       Log('URL was using HTTPS, trying HTTP as fallback...');
       StringChangeEx(URL, 'https', 'http', True);
-      Result := SendRequest(URL, False);
+      Result := SendRequest(URL, False, Asynchronous);
     end;
   end;
 end;

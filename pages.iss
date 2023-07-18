@@ -103,20 +103,17 @@ begin
       ManualInstallQuestionPage.AddEx('&' + ExpandConstant('{cm:MIQP_Update}'), 0, True)
     else
       ManualInstallQuestionPage.AddEx('&' + ExpandConstant('{cm:MIQP_Repair}'), 0, True);
-    ManualInstallQuestionPage.Values[4] := WizardIsComponentInstalledMultiSetup('additional\telemetry'); 
+    ManualInstallQuestionPage.Values[4] := True;
   end;
 
-  if (not WizardIsComponentInstalledMultiSetup('additional\telemetry')) then
+  
+  ManualInstallQuestionPage.AddEx('&' + ExpandConstant('{cm:MIQP_Telemetry}'), 0, False);
+  if (WizardIsComponentInstalledMultiSetup('additional\telemetry')) then
   begin
-    if (IsGameInstalled()) then
-    begin
-      ManualInstallQuestionPage.AddEx('&' + ExpandConstant('{cm:MIQP_Telemetry}'), 0, False);
-      ManualInstallQuestionPage.Values[5] := WizardIsComponentInstalledMultiSetup('additional\telemetry');
-    end
-    else begin
-      ManualInstallQuestionPage.AddEx('&' + ExpandConstant('{cm:MIQP_Telemetry}'), 0, False);
+    if (IsGameInstalled()) then 
+      ManualInstallQuestionPage.Values[5] :=  WizardIsComponentInstalledMultiSetup('additional\telemetry')
+    else
       ManualInstallQuestionPage.Values[4] := WizardIsComponentInstalledMultiSetup('additional\telemetry');
-    end
   end;
 end;
 
@@ -130,12 +127,12 @@ begin
     CreateInputOptionPage(ManualInstallQuestionPage.ID, ExpandConstant('{cm:GPUIQP_Title}'),
       ExpandConstant('{cm:GPUIQP_Desc}'), ExpandConstant('{cm:GPUIQP_Content}'), True, False);
 
-  GPUInstallQuestionPage.Add('&' + ExpandConstant('{cm:GPUIQP_NVIDIA}') + ' (DirectX Native)');
+  GPUInstallQuestionPage.Add('&' + ExpandConstant('{cm:GPUIQP_NVIDIA}') + ' (DirectX Wrapper 11 API 11)');
   if (IsWindows10OrNewer) then
-    GPUInstallQuestionPage.Add('&' + ExpandConstant('{cm:GPUIQP_AMD}') + ' (DirectX Wrapper 12)')
+    GPUInstallQuestionPage.Add('&' + ExpandConstant('{cm:GPUIQP_AMD}') + ' (DirectX Wrapper 11 API 11)')
   else                                                                                         
-    GPUInstallQuestionPage.Add('&' + ExpandConstant('{cm:GPUIQP_AMD}') + ' (DirectX Wrapper 11)');
-  GPUInstallQuestionPage.Add('&' + ExpandConstant('{cm:GPUIQP_Intel}' + ' (DirectX Wrapper 11)'));
+    GPUInstallQuestionPage.Add('&' + ExpandConstant('{cm:GPUIQP_AMD}') + ' (DirectX Wrapper 11 API 10.1)');
+  GPUInstallQuestionPage.Add('&' + ExpandConstant('{cm:GPUIQP_Intel}' + ' (DirectX Wrapper 11 API 10.1)'));
   GPUInstallQuestionPage.Add('&' + ExpandConstant('{cm:GPUIQP_Default}' + ' (DirectX Wrapper 9)'));
 
   VendorId := String(EEStats_getGpuVendorId());
@@ -147,8 +144,7 @@ begin
   end else if (VendorId = '1002') then
   begin
     Log('AMD GPU detected');
-    GPUInstallQuestionPage.Values[0] := True
-    //GPUInstallQuestionPage.Values[1] := True
+    GPUInstallQuestionPage.Values[1] := True
   end else if (VendorId = '8086') then
   begin
     Log('Intel GPU detected');
