@@ -177,7 +177,7 @@
 ;         | DirectX End-User Runtime install now use the web based installer to reduce the setup
 ;         | Added EE & AoC mutex to Setup to detect and avoid operations while an instance is running
 ; ----------------------------------------
-;  1.6.0  | NeoEE variants fix and dXm update
+;  1.6.0  | NeoEE maps update, localization fix and dXm update
 ;         |--------- 18/07/2023 ----------
 ;         | Updated dreXmod from v3.1 to v3.2
 ;         | - The game can now load campaign in other languages than the one used by Language.dll
@@ -203,10 +203,16 @@
 ;         | Stats send is now asynchronous (not sure that it work)
 ;         | Removed J2 civs
 ; ----------------------------------------
+;  1.6.1  | dgVoodoo update and window priority fixed
+;         |--------- 30/07/2023 ----------
+;         | Updated dgVoodoo from v2.79.3 to v2.81.0
+;         | dreXmod now show EE intro video by default if present to avoid window priority focus bug with dgVoodoo
+;         | dreXmod edited to respect XML v1 convention (header comment was wrong)
+; ----------------------------------------
 
 ; SETUP SETTINGS
 
-#define MySetupVersion "1.6.0"
+#define MySetupVersion "1.6.1"
 #define MyAppGroupName "Empire Earth"
 
 ; InstallMode : Regular / Portable
@@ -259,8 +265,8 @@
 ; When releasing a new MySetupVersion, it should be distribued for both EE & Neo
 ; MySetupVersion is a good way to know the features of the setup, meaning that EE & Neo should share the same version !
 
-#define EE_AppID "4C0B46D8-E7EB-4B95-97D4-A578D9B914C6"
-#define NeoEE_AppID "A24FCC7A-5491-4FEA-837B-4E4430C349DA"
+#define EE_AppID ""
+#define NeoEE_AppID ""
 
 #if InstallType == "EE"
   #define AppID EE_AppID
@@ -498,11 +504,11 @@ Name: "additional\drexmod"; Description: "dreXmod to enhance/add features (by Yu
 
 Name: "additional\directx_wrapper"; Description: "DirectX Wrapper"; Flags: disablenouninstallwarning; MinVersion: 0.0,6.1
 Name: "additional\directx_wrapper\dx9"; Description: "DirectX 9 [Most Compatible]"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
-Name: "additional\directx_wrapper\dx11_lvl10"; Description: "DirectX 11 API lvl 10 v2.79.3"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
-Name: "additional\directx_wrapper\dx11_lvl10_1"; Description: "DirectX 11 API lvl 10.1 v2.79.3"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
-Name: "additional\directx_wrapper\dx11_lvl11"; Description: "DirectX 11 API lvl 11 v2.79.3 [Generally Recommended]"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
-Name: "additional\directx_wrapper\dx12_lvl11"; Description: "DirectX 12 API lvl 11 v2.79.3 [Experimental]"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,10;
-Name: "additional\directx_wrapper\dx12_lvl12"; Description: "DirectX 12 API lvl 12 v2.79.3 [Experimental]"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,10;
+Name: "additional\directx_wrapper\dx11_lvl10"; Description: "DirectX 11 API lvl 10 v2.81.0"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
+Name: "additional\directx_wrapper\dx11_lvl10_1"; Description: "DirectX 11 API lvl 10.1 v2.81.0"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
+Name: "additional\directx_wrapper\dx11_lvl11"; Description: "DirectX 11 API lvl 11 v2.81.0 [Generally Recommended]"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
+Name: "additional\directx_wrapper\dx12_lvl11"; Description: "DirectX 12 API lvl 11 v2.81.0 [Experimental]"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,10;
+Name: "additional\directx_wrapper\dx12_lvl12"; Description: "DirectX 12 API lvl 12 v2.81.0 [Experimental]"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,10;
 
 Name: "additional\telemetry"; Description: "Telemetry (Compatibility and Stats)"; Flags: disablenouninstallwarning; MinVersion: 0.0,6.1
 Name: "additional\discord"; Description: "Discord Presence"; Flags: disablenouninstallwarning; Types: full compact; MinVersion: 0.0,6.1; Check: not IsWine
