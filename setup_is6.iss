@@ -227,10 +227,15 @@
 ;         | - Auto updater don't lock process for more than 5s (was 100s)
 ;         | - Missed message summary while in game
 ; ----------------------------------------
+;  1.7.1  | dreXmod update and performance improvement
+;         |--------- 29/11/2023 ----------
+;         | Fixed an invalid RMS in the NeoEE Extra RMS
+;         | Fixed invalid Vanilla custom RMS selection
+; ----------------------------------------
 
 ; SETUP SETTINGS
 
-#define MySetupVersion "1.7.0"
+#define MySetupVersion "1.7.1"
 #define MyAppGroupName "Empire Earth"
 
 ; InstallMode : Regular / Portable
@@ -686,7 +691,10 @@ Source: "data\Add-on\DLLs\dreXmod\3_privacy\*"; DestDir: "{app}\Empire Earth"; F
 ; RMS
 #if InstallType == "EE"
   ; Omega
-  Source: "data\Add-on\RMS\NeoExtra\*"; DestDir: "{app}\Empire Earth\Data\Random Map Scripts"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\rms\neoextra and game
+  Source: "data\Add-on\RMS\Omega\EE\*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts"; \
+    Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\rms\omega and game
+  Source: "data\Add-on\RMS\NeoExtra\*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts"; \
+    Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\rms\neoextra and gameaoc
 #endif
 
 ; dgVoodoo  Bin
@@ -1131,6 +1139,7 @@ Type: files; Name: "{app}\Empire Earth\Reborn.dll"
 Type: files; Name: "{app}\Empire Earth\EEStats.dll"
 Type: files; Name: "{app}\Empire Earth\EEStats.log"
 Type: filesandordirs; Name: "{app}\Empire Earth\Data\dxm"
+Type: filesandordirs; Name: "{app}\Empire Earth\Data\Random Map Scripts"
 Type: files; Name: "{app}\Empire Earth\dxmdata"
 Type: files; Name: "{app}\Empire Earth\discord_game_sdk.dll"
 Type: files; Name: "{app}\Empire Earth\EEDiscordRichPresence.dll"
@@ -1154,6 +1163,7 @@ Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Reborn.dll"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\EEStats.dll"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\EEStats.log"
 Type: filesandordirs; Name: "{app}\Empire Earth - The Art of Conquest\Data\dxm"
+Type: filesandordirs; Name: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\dxmdata"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\discord_game_sdk.dll"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\EEDiscordRichPresence.dll"
