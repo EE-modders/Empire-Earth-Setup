@@ -1,7 +1,6 @@
-![Visitor count](https://shields-io-visitor-counter.herokuapp.com/badge?page=EE-modders.Empire-Earth-Setup)
 [![GitHub stars](https://img.shields.io/github/stars/EE-modders/Empire-Earth-Setup)](https://github.com/EE-modders/Empire-Earth-Setup/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/EE-modders/Empire-Earth-Setup)](https://github.com/EE-modders/Empire-Earth-Setup/network)
-[![Setup Version](https://img.shields.io/badge/Setup%20Version-v1.6.1-blue)](https://github.com/EE-modders/Empire-Earth-Setup)
+[![Setup Version](https://img.shields.io/badge/Setup%20Version-v1.7.0-blue)](https://github.com/EE-modders/Empire-Earth-Setup)
 # 📥 Empire Earth Community Setup
 
 ## Features
@@ -13,7 +12,7 @@
 📣 Discord Status\
 📥 Download localized content online (support mirror)\
 ✅ Online update checker (support mirror)\
-🖥️ DirectX Wrapper (DX9 to DX12)\
+🖥️ DirectX Wrapper (DX7 to DX12)\
 🪛 Better compatibility with additonal flags\
 ➕ More maps and HD Textures (preview)\
 ➕ dreXmod 2 & 3\
@@ -29,7 +28,7 @@
 Empire Earth is very sensitive to version change (which leads to multiplayer incompatibility), some modders might be interested in using this setup to deliver their mods. Please do not do this unless you have created a really popular and functional modpack. We must avoid creating multiple versions of the game to avoid fracturing the community.
 
 ## Notes for Dev 
-Since the script is licensed under the GNU GPL v3 you have every right to modify the setup script to generate your own versions, but you must also publish the source code of the script. So I invite you to fork this project if you want and I pray you don't forget that we have to do everything to unite the community around the world, if you have ideas of modifications to do don't hesitate to make suggestions, I also invite you to make pull requests if you think you have done something that deserves to be in this script. The version of the script I'm distributing should become the standard to facilitate future installations. I hope you understand the objective and how necessary and helpful it is for everyone. If you think something is wrong, don't hesitate to tell me!
+Since the script is licensed under the GNU GPL v3 you have every right to modify the setup script to generate your own versions, but you must also publish the source code of the script. So if you want to contribute I invite you to fork this project, if you have ideas of modifications to do don't hesitate to make suggestions, I also invite you to make pull requests if you think you have done something that deserves to be in this script. The version of the script I'm distributing should become the standard to facilitate future installations. I hope you understand the objective and how necessary and helpful it is for everyone. If you think something is wrong, don't hesitate to tell me!
 
 ## License
 Consider setup_is6.iss, utils.iss, pages.iss, messages.iss, extention.iss under **GPL-3.0 License**.

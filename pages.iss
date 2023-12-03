@@ -134,6 +134,7 @@ begin
     GPUInstallQuestionPage.Add('&' + ExpandConstant('{cm:GPUIQP_AMD}') + ' (DirectX Wrapper 11 API 10.1)');
   GPUInstallQuestionPage.Add('&' + ExpandConstant('{cm:GPUIQP_Intel}' + ' (DirectX Wrapper 11 API 10.1)'));
   GPUInstallQuestionPage.Add('&' + ExpandConstant('{cm:GPUIQP_Default}' + ' (DirectX Wrapper 9)'));
+  GPUInstallQuestionPage.Add('&Native');
 
   VendorId := String(EEStats_getGpuVendorId());
 

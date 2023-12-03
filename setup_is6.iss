@@ -1,5 +1,5 @@
 ; ---------------------------------------
-;      By EnergyCube#7471 2020-2023
+;        By EnergyCube 2020-2023
 ;      Empire Earth Community Setup
 ;     GNU General Public License v3.0
 ; ---------------------------------------
@@ -12,7 +12,7 @@
 ; ---------------------------------------
 ; Translations :
 ;  German   : xXxJannik#0001, AmbozZ_Ger#3847
-;  French   : EnergyCube#7471
+;  French   : EnergyCube
 ;  Polish   : Dr.MonaLisa#9523, jorrr1#1558
 ;  Italian  : Âgræl#9008
 ;  Spanish  : IvaN#9233, Kurt Z#8222
@@ -209,10 +209,28 @@
 ;         | dreXmod now show EE intro video by default if present to avoid window priority focus bug with dgVoodoo
 ;         | dreXmod edited to respect XML v1 convention (header comment was wrong)
 ; ----------------------------------------
+;  1.7.0  | dreXmod update and performance improvement
+;         |--------- 29/11/2023 ----------
+;         | Updated dgVoodoo from v2.81.0 to v2.82.1
+;         | - Corrected window size issue when going in game from lobby/scn editor and dgVoodoo
+;         | - White minimap fixed
+;         | Added DDrawCompat 0.5.1 pre-release with EE fix #251
+;         | Minor file clean-up improvement
+;         | Added NeoEE extra maps by default for NeoEE installs
+;         | Updated French _WONStatus.cfg
+;         | Disabled Anti-Virus prevention message as most anti virus no longer report false positive
+;         | Updated dreXmod from v3.2 to v3.4
+;         | - Fixed game crash on Windows < 8 caused by 32 bits display check skip
+;         | - 10 Players support in lobby
+;         | - Menu resolution editable during runtime in the game settings
+;         | - Force vertex buffer into system memory for T&L
+;         | - Auto updater don't lock process for more than 5s (was 100s)
+;         | - Missed message summary while in game
+; ----------------------------------------
 
 ; SETUP SETTINGS
 
-#define MySetupVersion "1.6.1"
+#define MySetupVersion "1.7.0"
 #define MyAppGroupName "Empire Earth"
 
 ; InstallMode : Regular / Portable
@@ -445,13 +463,19 @@ Name: "sl"; MessagesFile: "compiler:Languages\Slovenian.isl"
 Name: "tr"; MessagesFile: "compiler:Languages\Turkish.isl"
 Name: "uk"; MessagesFile: "compiler:Languages\Ukrainian.isl"
 
+[Types]
+Name: "full"; Description: "Full game install";
+Name: "compact"; Description: "Compact game install";
+Name: "custom"; Description: "Custom game install"; Flags: iscustom
+Name: "raw"; Description: "Raw game install";
+
 [Tasks]
 Name: "compatibility"; Description: "Enable compatibility flags"; MinVersion: 0.0,5.1; Check: not IsWine
 Name: "compatibility_windows"; Description: "Enable earlier Windows compatibility mode"; MinVersion: 0.0,5.1; Check: not IsWine
 Name: "firewallexception"; Description: "Add Empire Earth in the FireWall"; MinVersion: 0.0,5.0; Check: IsAdminInstallMode and not IsWine
 ; GOG Setup install DirectPlay but i don't think it's really important... some kind of default install for old DX game maybe
 Name: "directplay"; Description: "Install DirectPlay"; MinVersion: 6.2; Check: IsAdminInstallMode
-Name: "dxwebsetup"; Description: "Install DirectX End-User Runtime"; MinVersion: 0.0,5.0; Check: IsAdminInstallMode; Components: additional\directx_wrapper\dx9 or not additional\directx_wrapper 
+Name: "dxwebsetup"; Description: "Install DirectX End-User Runtime"; MinVersion: 0.0,5.0; Check: IsAdminInstallMode and not IsWine; Components: additional\directx_wrapper\dx9 or not additional\directx_wrapper 
 #if InstallType == "NeoEE"
   ; Since 1.0.1.0 NeoEE CDKeys support HKLM & HKCU
   Name: "neoee_cdkeys"; Description: "Register NeoEE CDKeys (Required to use the online lobby)"; MinVersion: 0.0,5.0;
@@ -470,7 +494,7 @@ Name: "everyoneadminstart"; Description: "Require administrator rights for all u
 #endif
 
 [Components]
-Name: "game"; Description: "{#MyAppName}"; Types: full compact custom; Flags: fixed
+Name: "game"; Description: "{#MyAppName}"; Types: full compact custom raw; Flags: fixed
 ; ------------------
 Name: "gameaoc"; Description: "{#MyAppName} : The Art of Conquest"; Types: full
 ; ------------------
@@ -499,16 +523,17 @@ Name: "additional\drexmod"; Description: "dreXmod to enhance/add features (by Yu
 #if InstallType == "EE"
   Name: "additional\rms"; Description: "Random Map Scripts";
   Name: "additional\rms\omega"; Description: "Omega Pack";
-  Name: "additional\rms\kazter"; Description: "Kazter Pack for Neo v1";
+  Name: "additional\rms\neoextra"; Description: "NeoEE Extra";
 #endif
 
 Name: "additional\directx_wrapper"; Description: "DirectX Wrapper"; Flags: disablenouninstallwarning; MinVersion: 0.0,6.1
+Name: "additional\directx_wrapper\dx7"; Description: "DirectX 7 [Lightest]"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
 Name: "additional\directx_wrapper\dx9"; Description: "DirectX 9 [Most Compatible]"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
-Name: "additional\directx_wrapper\dx11_lvl10"; Description: "DirectX 11 API lvl 10 v2.81.0"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
-Name: "additional\directx_wrapper\dx11_lvl10_1"; Description: "DirectX 11 API lvl 10.1 v2.81.0"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
-Name: "additional\directx_wrapper\dx11_lvl11"; Description: "DirectX 11 API lvl 11 v2.81.0 [Generally Recommended]"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
-Name: "additional\directx_wrapper\dx12_lvl11"; Description: "DirectX 12 API lvl 11 v2.81.0 [Experimental]"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,10;
-Name: "additional\directx_wrapper\dx12_lvl12"; Description: "DirectX 12 API lvl 12 v2.81.0 [Experimental]"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,10;
+Name: "additional\directx_wrapper\dx11_lvl10"; Description: "DirectX 11 API lvl 10 v2.82.1"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
+Name: "additional\directx_wrapper\dx11_lvl10_1"; Description: "DirectX 11 API lvl 10.1 v2.82.1"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
+Name: "additional\directx_wrapper\dx11_lvl11"; Description: "DirectX 11 API lvl 11 v2.82.1 [Generally Recommended]"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,6.1
+Name: "additional\directx_wrapper\dx12_lvl11"; Description: "DirectX 12 API lvl 11 v2.82.1 [Experimental]"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,10;
+Name: "additional\directx_wrapper\dx12_lvl12"; Description: "DirectX 12 API lvl 12 v2.82.1 [Experimental]"; Flags: exclusive disablenouninstallwarning; MinVersion: 0.0,10;
 
 Name: "additional\telemetry"; Description: "Telemetry (Compatibility and Stats)"; Flags: disablenouninstallwarning; MinVersion: 0.0,6.1
 Name: "additional\discord"; Description: "Discord Presence"; Flags: disablenouninstallwarning; Types: full compact; MinVersion: 0.0,6.1; Check: not IsWine
@@ -518,7 +543,7 @@ Name: "additional\civs"; Description: "Civilizations"
 Name: "additional\civs\ec"; Description: "eC Standard Civilizations (25)"; Types: full compact
 Name: "additional\civs\ec_full"; Description: "eC Full Civilizations (71)"; Types: full
 
-Name: "language"; Description: "Game Language"; Types: full compact custom; Flags: disablenouninstallwarning fixed;
+Name: "language"; Description: "Game Language"; Types: full compact custom raw; Flags: disablenouninstallwarning fixed;
 Name: "language\de"; Description: "{cm:LIQP_de}"; Flags: exclusive;
 Name: "language\en"; Description: "{cm:LIQP_en}"; Flags: exclusive;
 Name: "language\es"; Description: "{cm:LIQP_es}"; Flags: exclusive;
@@ -530,7 +555,7 @@ Name: "language\pt_BR"; Description: "{cm:LIQP_pt_BR}"; Flags: exclusive;
 Name: "language\ru"; Description: "{cm:LIQP_ru}"; Flags: exclusive;
 Name: "language\zh_CN"; Description: "{cm:LIQP_zh_CN}"; Flags: exclusive;
 Name: "language\zh_TW"; Description: "{cm:LIQP_zh_TW}"; Flags: exclusive;
-Name: "language\update"; Description: "Download localized voices and campaigns"; Types: full compact custom; Flags: disablenouninstallwarning;
+Name: "language\update"; Description: "Download localized voices and campaigns"; Types: full compact custom raw; Flags: disablenouninstallwarning;
 
 [Files]
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
@@ -550,7 +575,7 @@ Source: "data\Add-on\DLLs\EEStats\EEStatsSetup.dll"; DestDir: "{app}\{#AppID}"; 
   Source: "internal\media\SetupBackground-16-9-Neo.bmp"; DestDir: "{tmp}"; DestName: "SetupBackground-16-9.bmp"; Flags: deleteafterinstall dontcopy noencryption
 #endif
 
-Source: "internal\runtime\directx\dxwebsetup.exe"; DestDir: "{tmp}\directx"; Flags: deleteafterinstall ignoreversion recursesubdirs createallsubdirs nocompression; Check: IsAdminInstallMode; Tasks: dxwebsetup
+Source: "internal\runtime\directx\dxwebsetup.exe"; DestDir: "{tmp}\directx"; Flags: deleteafterinstall ignoreversion recursesubdirs createallsubdirs nocompression; Tasks: dxwebsetup
 
 ; ----------------
 
@@ -564,7 +589,7 @@ Source: "data\Add-on\Movies\EE\*"; DestDir: "{app}\Empire Earth\Data\Movies"; Fl
   Source: "data\NeoEE Base\Empire Earth\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game
   Source: "data\NeoEE Base\shared\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game
   Source: "data\Add-on\RMS\Omega\EE\*"; DestDir: "{app}\Empire Earth\Data\Random Map Scripts"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game
-  Source: "data\Add-on\RMS\Kazter\*"; DestDir: "{app}\Empire Earth\Data\Random Map Scripts"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game
+  Source: "data\Add-on\RMS\NeoExtra\*"; DestDir: "{app}\Empire Earth\Data\Random Map Scripts"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game
   Source: "data\NeoEE - Admin\Empire Earth\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game; Check: IsAdminInstallMode
   Source: "data\NeoEE - User\Empire Earth\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: game; Check: not IsAdminInstallMode
   Source: "data\NeoEE - CDKeys\authtools.dll"; DestDir: "{tmp}"; DestName: "authtools.dll"; Flags: dontcopy noencryption nocompression; Components: game;
@@ -661,13 +686,13 @@ Source: "data\Add-on\DLLs\dreXmod\3_privacy\*"; DestDir: "{app}\Empire Earth"; F
 ; RMS
 #if InstallType == "EE"
   ; Omega
-  Source: "data\Add-on\RMS\Omega\EE\*"; DestDir: "{app}\Empire Earth\Data\Random Map Scripts"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\rms\omega and game
-  Source: "data\Add-on\RMS\Kazter\*"; DestDir: "{app}\Empire Earth\Data\Random Map Scripts"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\rms\kazter and game
+  Source: "data\Add-on\RMS\NeoExtra\*"; DestDir: "{app}\Empire Earth\Data\Random Map Scripts"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\rms\neoextra and game
 #endif
 
 ; dgVoodoo  Bin
-Source: "data\Add-on\DirectX_Wrapper\dgVoodoo_bin\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper and game and not additional\directx_wrapper\dx9
+Source: "data\Add-on\DirectX_Wrapper\dgVoodoo_bin\*"; DestDir: "{app}\Empire Earth"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper and game and not additional\directx_wrapper\dx9 and not additional\directx_wrapper\dx7
 Source: "data\\Add-on\DirectX_Wrapper\GOG\DDraw.dll"; DestDir: "{app}\Empire Earth"; DestName: "DDraw.dll"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx9 and game;
+Source: "data\\Add-on\DirectX_Wrapper\DDrawCompat\DDraw.dll"; DestDir: "{app}\Empire Earth"; DestName: "DDraw.dll"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx7 and game;
 ; dgVoodoo Conf
 Source: "data\Add-on\DirectX_Wrapper\dgVoodoo_conf\dgVoodoo_DX11_LVL10.conf"; DestDir: "{app}\Empire Earth"; DestName: "dgVoodoo.conf"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx11_lvl10 and game;
 Source: "data\Add-on\DirectX_Wrapper\dgVoodoo_conf\dgVoodoo_DX11_LVL10_1.conf"; DestDir: "{app}\Empire Earth"; DestName: "dgVoodoo.conf"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx11_lvl10_1 and game;
@@ -727,7 +752,7 @@ Source: "data\Add-on\Movies\AoC\*"; DestDir: "{app}\Empire Earth - The Art of Co
     Flags: ignoreversion recursesubdirs createallsubdirs; Components: gameaoc
   Source: "data\Add-on\RMS\Omega\AoC\*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts"; \
     Flags: ignoreversion recursesubdirs createallsubdirs; Components: gameaoc
-  Source: "data\Add-on\RMS\Kazter\*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts"; \
+  Source: "data\Add-on\RMS\NeoExtra\*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts"; \
     Flags: ignoreversion recursesubdirs createallsubdirs; Components: gameaoc
   Source: "data\NeoEE - Admin\Empire Earth - The Art of Conquest\*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
     Flags: ignoreversion recursesubdirs createallsubdirs; Components: gameaoc; Check: IsAdminInstallMode
@@ -836,14 +861,17 @@ Source: "data\Add-on\DLLs\dreXmod\3_privacy\*"; DestDir: "{app}\Empire Earth"; \
   ; Omega
   Source: "data\Add-on\RMS\Omega\AoC\*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts"; \
     Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\rms\omega and gameaoc
-  Source: "data\Add-on\RMS\Kazter\*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\rms\kazter and gameaoc
+  Source: "data\Add-on\RMS\NeoExtra\*"; DestDir: "{app}\Empire Earth - The Art of Conquest\Data\Random Map Scripts"; \
+    Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\rms\neoextra and gameaoc
 #endif
 
 ; dgVoodoo  Bin
 Source: "data\Add-on\DirectX_Wrapper\dgVoodoo_bin\*"; DestDir: "{app}\Empire Earth - The Art of Conquest"; \
-  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper and gameaoc and not additional\directx_wrapper\dx9
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper and gameaoc and not additional\directx_wrapper\dx9 and not additional\directx_wrapper\dx7
 Source: "data\\Add-on\DirectX_Wrapper\GOG\DDraw.dll"; DestDir: "{app}\Empire Earth - The Art of Conquest"; DestName: "DDraw.dll"; \
   Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx9 and gameaoc;
+Source: "data\\Add-on\DirectX_Wrapper\DDrawCompat\DDraw.dll"; DestDir: "{app}\Empire Earth - The Art of Conquest"; DestName: "DDraw.dll"; \
+  Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx7 and gameaoc;
 ; dgVoodoo Conf
 Source: "data\Add-on\DirectX_Wrapper\dgVoodoo_conf\dgVoodoo_DX11_LVL10.conf"; DestDir: "{app}\Empire Earth - The Art of Conquest"; DestName: "dgVoodoo.conf"; \
   Flags: ignoreversion recursesubdirs createallsubdirs; Components: additional\directx_wrapper\dx11_lvl10 and gameaoc;
@@ -1007,7 +1035,8 @@ Root: "HKCU"; Subkey: "{#BaseRegCompatibility}"; ValueType: String; ValueName: "
 Root: "HKCU"; Subkey: "{#BaseRegEE}"; Flags: uninsdeletekey; Components: game
 Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D Hardware TnL"; Flags: deletevalue; Components: game and not additional\directx_wrapper; Check: not IsWine
 Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Flags: deletevalue; Components: game and additional\directx_wrapper; Check: not IsWine
-Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Flags: deletevalue; Components: game
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Flags: deletevalue; Components: game; Check: IsWine
+Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "Wait for VSync"; ValueData: "$0"; Flags: deletevalue; Components: game;
 Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: Dword; ValueName: "AutoSave In Milliseconds"; ValueData: "$124F80"; Flags: createvalueifdoesntexist; Components: game
 Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: String; ValueName: "Map Type"; ValueData: "Continental"; Flags: createvalueifdoesntexist; Components: game
 Root: "HKCU"; Subkey: "{#BaseRegEE}\Game Options"; ValueType: Dword; ValueName: "Map Size"; ValueData: "$2"; Flags: createvalueifdoesntexist; Components: game
@@ -1039,9 +1068,10 @@ Root: "HKCU"; Subkey: "{#BaseRegEE}"; ValueType: string; ValueName: "Installed F
 ; ----------------
 
 Root: "HKCU"; Subkey: "{#BaseRegAoC}"; Flags: uninsdeletekey; Components: gameaoc
-Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D Hardware TnL"; Flags: deletevalue; Components: gameaoc and not additional\directx_wrapper
-Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Flags: deletevalue; Components: gameaoc and additional\directx_wrapper
-Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D";  Flags: deletevalue; Check: IsWine; Components: gameaoc
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D Hardware TnL"; Flags: deletevalue; Components: gameaoc and not additional\directx_wrapper; Check: not IsWine
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Flags: deletevalue; Components: gameaoc and additional\directx_wrapper; Check: not IsWine
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: String; ValueName: "Rasterizer Name"; ValueData: "Direct3D"; Flags: deletevalue; Components: gameaoc; Check: IsWine
+Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "Wait for VSync"; ValueData: "$0"; Flags: deletevalue; Components: game;
 Root: "HKCU"; Subkey: "{#BaseRegAoC}"; ValueType: Dword; ValueName: "AutoSave In Milliseconds"; ValueData: "$124F80"; Flags: createvalueifdoesntexist; Components: gameaoc
 Root: "HKCU"; Subkey: "{#BaseRegAoC}\Game Options"; ValueType: String; ValueName: "Map Type"; ValueData: "Continental"; Flags: createvalueifdoesntexist; Components: gameaoc
 Root: "HKCU"; Subkey: "{#BaseRegAoC}\Game Options"; ValueType: Dword; ValueName: "Map Size"; ValueData: "$2"; Flags: createvalueifdoesntexist; Components: gameaoc
@@ -1091,6 +1121,7 @@ Type: files; Name: "{app}\Empire Earth\D3D8.dll"
 Type: files; Name: "{app}\Empire Earth\D3D9.dll"
 Type: files; Name: "{app}\Empire Earth\D3DImm.dll"
 Type: files; Name: "{app}\Empire Earth\DDraw.dll"
+Type: files; Name: "{app}\Empire Earth\DDrawCompat*.log"
 Type: files; Name: "{app}\Empire Earth\dgVoodooCpl.exe"
 Type: files; Name: "{app}\Empire Earth\dgVoodoo.conf"
 Type: files; Name: "{app}\Empire Earth\dreXmod.config"
@@ -1109,7 +1140,7 @@ Type: files; Name: "{app}\Empire Earth\Data\Scenarios\ScenDefault.scn"
 Type: files; Name: "{app}\Empire Earth\OOS *.log"
 Type: filesandordirs; Name: "{app}\Empire Earth\Data\Movies\";
 ; ----------------
-Type: files; Name: "{app}\Empire Earth - The Art of Conquest\EE-AOC"
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\EE-AOC.exe"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\D3D8.dll"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\D3D9.dll"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\D3DImm.dll"
@@ -1147,6 +1178,7 @@ Type: files; Name: "{app}\Empire Earth\_won*"
 Type: files; Name: "{app}\Empire Earth\upnp_info.txt"
 Type: filesandordirs; Name: "{app}\Empire Earth\_wonHTTPCache"
 Type: files; Name: "{app}\Empire Earth\Data\Scenarios\ScenDefault.scn"
+Type: files; Name: "{app}\Empire Earth\OOS *.log"
 ; pt_BR create that dir for some reasons (not used)
 Type: filesandordirs; Name: "{app}\Empire Earth\Users\default\Civilizações"
 ; ----------------
@@ -1160,6 +1192,7 @@ Type: files; Name: "{app}\Empire Earth - The Art of Conquest\_won*"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\upnp_info.txt"
 Type: filesandordirs; Name: "{app}\Empire Earth - The Art of Conquest\_wonHTTPCache"
 Type: files; Name: "{app}\Empire Earth - The Art of Conquest\Data\Scenarios\ScenDefault.scn"
+Type: files; Name: "{app}\Empire Earth - The Art of Conquest\OOS *.log"
 ; pt_BR create that dir for some reasons (not used)
 Type: filesandordirs; Name: "{app}\Empire Earth - The Art of Conquest\Users\default\Civilizações"
 ; ----------------
@@ -1536,10 +1569,10 @@ begin
   // AntiVirus/Portable/User Warning
   if (not SilentInstall and not SuppressMsgBoxes) then
   begin
-    if IsAdminInstallMode and not IsWine then
-    begin
-      MsgBox(ExpandConstant('{cm:AntiVirusWarning}'), mbInformation, MB_OK);
-    end;
+    //if IsAdminInstallMode and not IsWine then
+    //begin
+    //  MsgBox(ExpandConstant('{cm:AntiVirusWarning}'), mbInformation, MB_OK);
+    //end;
 
     if (ExpandConstant('{#InstallMode}') = 'Portable') then
     begin
@@ -1942,6 +1975,11 @@ begin
     begin
       Log('Using general GPU settings');
       WizardSelectComponents('additional\directx_wrapper\dx9');
+    end
+    else if (GPUInstallQuestionPage.Values[4]) then     // Native
+    begin
+      Log('Using general Native');
+      WizardSelectComponents('!additional\directx_wrapper');
     end;
   end;
 
