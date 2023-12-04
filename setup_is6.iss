@@ -232,17 +232,31 @@
 ;         | Fixed an invalid RMS in the NeoEE Extra RMS
 ;         | Fixed invalid Vanilla custom RMS selection
 ; ----------------------------------------
+;  1.7.2  | updated dreXmod config
+;         |--------- 04/12/2023 ----------
+;         | dreXmod config changes
+;         | - Disabled mod section
+;         | - Fixed invalid HUD size since 10 players support
+; ----------------------------------------
+;         |--------- 
+;         | TODO
+;         |---------
+;         | AoC civs + remove EE civs from AoC
+;         | Fix supp msg box that cause easy install and lang to fail selection
+; patch TNL by default
+; .1 ee rms fix omega / neo 
+; ----------------------------------------
 
 ; SETUP SETTINGS
 
-#define MySetupVersion "1.7.1"
+#define MySetupVersion "1.7.2"
 #define MyAppGroupName "Empire Earth"
 
 ; InstallMode : Regular / Portable
 #define InstallMode "Regular"
 
 ; InstallType : EE / NeoEE
-#define InstallType "EE"
+#define InstallType "NeoEE"
 
 ; Sign Setup/Uninstall
 
@@ -251,15 +265,15 @@
 ;       However, when a user installs a signed version of the setup, by default he installs the joint
 ;       certificate on his computer (if CertInclude = true + user confirmation). If you want to use
 ;       the community certificate, contact me on discord, I will sign your setup after a verification.
-#define SignSetup false
+#define SignSetup true
 
 #if SignSetup
   ; Install Cert
   #define CertInclude true
   ; Cert File Name (Need to be in data)
-  #define CertFileName "cert_name.crt"
+  #define CertFileName "Empire_Earth_Community.crt"
   ; Cert Hash SHA1 (very important, needed to uninstall the cert)
-  #define CertHashSHA1 ""
+  #define CertHashSHA1 "f8738c3549ef138f6f3b1777d4cc1acf233dcd47"
 #else
   #define CertInclude false
 #endif
@@ -288,8 +302,8 @@
 ; When releasing a new MySetupVersion, it should be distribued for both EE & Neo
 ; MySetupVersion is a good way to know the features of the setup, meaning that EE & Neo should share the same version !
 
-#define EE_AppID ""
-#define NeoEE_AppID ""
+#define EE_AppID "4C0B46D8-E7EB-4B95-97D4-A578D9B914C6"
+#define NeoEE_AppID "A24FCC7A-5491-4FEA-837B-4E4430C349DA"
 
 #if InstallType == "EE"
   #define AppID EE_AppID
@@ -323,13 +337,13 @@ AppId={{{#AppID}}
   SetupIconFile=data\Empire Earth Base\Empire Earth\game.ico
   WizardSmallImageFile=internal\media\WizardSmallImageFileEE.bmp
   #if SignSetup
-    SignTool=NameInInnoSetupEE $f
+    SignTool=EmpireEarthCommunityEE $f
   #endif
 #elif InstallType == "NeoEE"
   SetupIconFile=data\NeoEE Base\shared\neoee.ico
   WizardSmallImageFile=internal\media\WizardSmallImageFileNeo.bmp
   #if SignSetup
-    SignTool=NameInInnoSetupNeo $f
+    SignTool=EmpireEarthCommunityNeo $f
   #endif
 #endif
 SetupMutex={#InstallType}_Setup

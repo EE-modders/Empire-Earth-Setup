@@ -1,6 +1,6 @@
 [![GitHub stars](https://img.shields.io/github/stars/EE-modders/Empire-Earth-Setup)](https://github.com/EE-modders/Empire-Earth-Setup/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/EE-modders/Empire-Earth-Setup)](https://github.com/EE-modders/Empire-Earth-Setup/network)
-[![Setup Version](https://img.shields.io/badge/Setup%20Version-v1.7.1-blue)](https://github.com/EE-modders/Empire-Earth-Setup)
+[![Setup Version](https://img.shields.io/badge/Setup%20Version-v1.7.2-blue)](https://github.com/EE-modders/Empire-Earth-Setup)
 # 📥 Empire Earth Community Setup
 
 ## Features
