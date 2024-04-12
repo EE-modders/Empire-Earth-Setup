@@ -232,10 +232,16 @@
 ;         | Fixed an invalid RMS in the NeoEE Extra RMS
 ;         | Fixed invalid Vanilla custom RMS selection
 ; ----------------------------------------
+;  1.7.2  | updated dreXmod config
+;         |--------- 04/12/2023 ----------
+;         | dreXmod config changes
+;         | - Disabled mod section
+;         | - Fixed invalid HUD size since 10 players support
+; ----------------------------------------
 
 ; SETUP SETTINGS
 
-#define MySetupVersion "1.7.1"
+#define MySetupVersion "1.7.2"
 #define MyAppGroupName "Empire Earth"
 
 ; InstallMode : Regular / Portable
